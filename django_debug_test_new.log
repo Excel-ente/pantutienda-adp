@@ -1,0 +1,94 @@
+ERROR 2024-10-24 15:47:39,703 log Internal Server Error: /app/inventario/producto/14/change/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 714, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1944, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1802, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1853, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1257, in save_model
+    obj.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 901, in save_base
+    updated = self._save_table(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 1019, in _save_table
+    values = [
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 1023, in <listcomp>
+    (getattr(self, f.attname) if raw else f.pre_save(self, False)),
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/fields/files.py", line 317, in pre_save
+    file.save(file.name, file.file, save=False)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/fields/files.py", line 93, in save
+    self.name = self.storage.save(name, content, max_length=self.field.max_length)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/files/storage/base.py", line 38, in save
+    name = self._save(name, content)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/files/storage/filesystem.py", line 106, in _save
+    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/aplicaciones/pantutienda-adp/media/img/Sitio_Web_Link_2kh2deX.png'
+ERROR 2024-10-24 15:48:44,819 log Internal Server Error: /app/inventario/producto/14/change/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 714, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1944, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1802, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1853, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/admin/options.py", line 1257, in save_model
+    obj.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 901, in save_base
+    updated = self._save_table(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 1019, in _save_table
+    values = [
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 1023, in <listcomp>
+    (getattr(self, f.attname) if raw else f.pre_save(self, False)),
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/fields/files.py", line 317, in pre_save
+    file.save(file.name, file.file, save=False)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/fields/files.py", line 93, in save
+    self.name = self.storage.save(name, content, max_length=self.field.max_length)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/files/storage/base.py", line 38, in save
+    name = self._save(name, content)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/files/storage/filesystem.py", line 106, in _save
+    fd = os.open(full_path, self.OS_OPEN_FLAGS, 0o666)
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/aplicaciones/pantutienda-adp/media/img/Sitio_Web_Link_fjJavLT.png'

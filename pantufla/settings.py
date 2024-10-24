@@ -164,7 +164,7 @@ LOGIN_REDIRECT_URL = '/'  # Cambia 'home' por la vista a donde quieras redirigir
 LOGOUT_REDIRECT_URL = '/'  # Redirigir después del logout
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/ubuntu/aplicaciones/pantutienda/static/'
+STATIC_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/static/'
 
 #STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
@@ -174,7 +174,7 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/ubuntu/aplicaciones/pantutienda/media/'
+MEDIA_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/media/'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 

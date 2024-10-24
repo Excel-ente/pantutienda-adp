@@ -263,34 +263,36 @@ class CompraAdmin(ImportExportModelAdmin):
         extra_context.update(
             {
             'cards_doble': True,
-
+            
             'emoji_1':f'📦',
             'etiqueta_1': 'Total Compras',
             'label_val_etiqueta_1' : f'Total:',
-            'val_etiqueta_1': f'{totals['total_compras'] or 0:,}',
+            'val_etiqueta_1': f"{totals['total_compras'] or 0:,}",
+
             'label_sub_val_etiqueta_1' : f'Importe:',
-            'sub_val_etiqueta_1': f'$ {totals['total_compras_monto'] or 0:,.2f}',
+            'sub_val_etiqueta_1': f"$ {totals['total_compras_monto'] or 0:,.2f}",
 
             'emoji_2': f'🛒',
             'etiqueta_2': 'Compras Pendientes',
             'label_val_etiqueta_2' : f'Total:',
-            'val_etiqueta_2': f'{totals['total_pendientes'] or 0:,}',
+            'val_etiqueta_2': f"{totals['total_pendientes'] or 0:,}",
             'label_sub_val_etiqueta_2' : f'Importe:',
-            'sub_val_etiqueta_2': f'$ {totals['total_pendientes_monto'] or 0:,.2f}',
+            'sub_val_etiqueta_2': f"$ {totals['total_pendientes_monto'] or 0:,.2f}",
 
             'emoji_3': f'🚚',
             'etiqueta_3': 'Compras en Tránsito',
             'label_val_etiqueta_3' : f'Total:',
-            'val_etiqueta_3': f'{totals['total_en_transito'] or 0:,}',
+            'val_etiqueta_3': f"{totals['total_en_transito'] or 0:,}",
             'label_sub_val_etiqueta_3' : f'Importe:',
-            'sub_val_etiqueta_3': f'$ {totals['total_en_transito_monto'] or 0:,.2f}',
+            'sub_val_etiqueta_3': f"$ {totals['total_en_transito_monto'] or 0:,.2f}",
 
             'emoji_4': f'📦',
             'etiqueta_4': 'Descargando',
             'label_val_etiqueta_4' : f'Total:',
-            'val_etiqueta_4': f'{totals['total_en_descarga'] or 0:,}',
+            'val_etiqueta_4': f"{totals['total_en_descarga'] or 0:,}",
             'label_sub_val_etiqueta_4' : f'Importe:',
-            'sub_val_etiqueta_4': f'$ {totals['total_en_descarga_monto'] or 0:,.2f}',
+            'sub_val_etiqueta_4': f"$ {totals['total_en_descarga_monto'] or 0:,.2f}",
+
 
         }
         )

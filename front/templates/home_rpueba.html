@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos</title>
+    <style>
+        :root {
+            --primary-color: #f28f1d;
+            --background-color: #FFFFFF;
+            --text-color: #14171A;
+            --border-color: #E1E8ED;
+            --hover-color: #F5F8FA;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .header {
+            background-color: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .icons {
+            display: flex;
+            gap: 20px;
+        }
+        .icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .product {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            transition: box-shadow 0.3s ease;
+        }
+        .product:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: var(--background-color);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--hover-color);
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--background-color);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+        }
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: var(--hover-color);
+        }
+        .show {
+            display: block;
+        }
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+        .search-filter input,
+        .search-filter select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        .search-filter input {
+            width: 60%;
+        }
+        .search-filter select {
+            width: 30%;
+        }
+        @media (max-width: 768px) {
+            .product-list {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .icon {
+                font-size: 20px;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+            .search-filter {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .search-filter input,
+            .search-filter select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Hola, usuario</h1>
+        <div class="icons">
+            <span class="icon" role="img" aria-label="Productos" onclick="showProducts()">🛍️</span>
+            <span class="icon" role="img" aria-label="Carrito" onclick="showCart()">🛒</span>
+            <div class="dropdown">
+                <span class="icon" role="img" aria-label="Mi Perfil" onclick="toggleDropdown()">👤</span>
+                <div id="userDropdown" class="dropdown-content">
+                    <a href="#" onclick="showProfile()">Mi Perfil</a>
+                    <a href="#" onclick="showOrders()">Órdenes</a>
+                    <a href="#" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="mainContent">
+        <div class="search-filter">
+            <input type="text" id="searchInput" placeholder="Buscar productos..." oninput="filterProducts()">
+            <select id="categoryFilter" onchange="filterProducts()">
+                <option value="">Todas las categorías</option>
+            </select>
+        </div>
+        <div class="product-list" id="productList"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            {
+                id: 1,
+                code: 'PROD001',
+                image: 'https://via.placeholder.com/200',
+                description: 'Producto 1',
+                category: 'Categoría A',
+                prices: [10.99, 15.99, 20.99]
+            },
+            {
+                id: 2,
+                code: 'PROD002',
+                image: 'https://via.placeholder.com/200',
+                description: 'Producto 2',
+                category: 'Categoría B',
+                prices: [8.99]
+            },
+            {
+                id: 3,
+                code: 'PROD003',
+                image: 'https://via.placeholder.com/200',
+                description: 'Producto 3',
+                category: 'Categoría A',
+                prices: [12.99, 17.99]
+            },
+            {
+                id: 4,
+                code: 'PROD004',
+                image: 'https://via.placeholder.com/200',
+                description: 'Producto 4',
+                category: 'Categoría C',
+                prices: [14.99, 19.99]
+            },
+            {
+                id: 5,
+                code: 'PROD005',
+                image: 'https://via.placeholder.com/200',
+                description: 'Producto 5',
+                category: 'Categoría B',
+                prices: [9.99, 13.99]
+            }
+        ];
+
+        let cart = [];
+        let user = {
+            id: 12345,
+            firstName: 'Juan',
+            lastName: 'Pérez',
+            email: 'juan@example.com',
+            phone: '123-456-7890',
+            addresses: [
+                '123 Calle Principal, Ciudad',
+                '456 Avenida Secundaria, Pueblo'
+            ]
+        };
+
+        let orders = [
+            {
+                id: 'ORD001',
+                date: '2023-05-15',
+                total: 45.97,
+                status: 'Entregado',
+                items: [
+                    { productId: 1, quantity: 2 },
+                    { productId: 3, quantity: 1 }
+                ]
+            },
+            {
+                id: 'ORD002',
+                date: '2023-05-20',
+                total: 8.99,
+                status: 'En proceso',
+                items: [
+                    { productId: 2, quantity: 1 }
+                ]
+            }
+        ];
+
+        const mainContent = document.getElementById('mainContent');
+        const modal = document.getElementById('modal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+
+        function populateCategoryFilter() {
+            const categories = [...new Set(products.map(product => product.category))];
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        function filterProducts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+            const filteredProducts = products.filter(product => 
+                (product.description.toLowerCase().includes(searchTerm) || product.code.toLowerCase().includes(searchTerm)) &&
+                (selectedCategory === '' || product.category === selectedCategory)
+            );
+            renderProducts(filteredProducts);
+        }
+
+        function renderProducts(productsToRender = products) {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+            productsToRender.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product';
+                productElement.innerHTML = `
+                    <img src="${product.image}" alt="${product.description}" onclick="openModal(${product.id})">
+                    <h3>${product.description}</h3>
+                    <p>Código: ${product.code}</p>
+                    <p>Categoría: ${product.category}</p>
+                    <p>Precios: ${product.prices.map(price => `$${price.toFixed(2)}`).join(', ')}</p>
+                `;
+                productList.appendChild(productElement);
+            });
+        }
+
+        function openModal(productId) {
+            const product = products.find(p => p.id === productId);
+            modalTitle.textContent = 'Agregar al carrito';
+            modalContent.innerHTML = `
+                <p>${product.description}</p>
+                <label for="quantity">Cantidad:</label>
+                <input type="number" id="quantity" min="1" value="1">
+                <button onclick="addToCart(${product.id})">Agregar</button>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const cartItem = cart.find(item => item.product.id === productId);
+            if (cartItem) {
+                cartItem.quantity += quantity;
+            } else {
+                cart.push({ product, quantity });
+            }
+            modal.style.display = 'none';
+            alert('Producto agregado al carrito');
+        }
+
+        function showCart() {
+            mainContent.innerHTML = `
+                <h2>Carrito de Compras</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartItems"></tbody>
+                    </table>
+                </div>
+                <p id="cartTotal"></p>
+            `;
+            renderCart();
+        }
+
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            let total = 0;
+            cartItems.innerHTML = '';
+            cart.forEach((item, index) => {
+                const itemTotal = item.quantity * item.product.prices[0];
+                total += itemTotal;
+                cartItems.innerHTML += `
+                    <tr>
+                        <td>${item.product.description}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.product.prices[0].toFixed(2)}</td>
+                        <td>$${itemTotal.toFixed(2)}</td>
+                        <td>
+                            <button onclick="editCartItem(${index})">Editar</button>
+                            <button onclick="removeCartItem(${index})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            cartTotal.textContent = `Total a pagar: $${total.toFixed(2)}`;
+        }
+
+        function editCartItem(index) {
+            const item = cart[index];
+            modalTitle.textContent = 'Editar cantidad';
+            modalContent.innerHTML = `
+                <p>${item.product.description}</p>
+                <label for="editQuantity">Nueva cantidad:</label>
+                <input type="number" id="editQuantity" min="1" value="${item.quantity}">
+                <button onclick="updateCartItem(${index})">Actualizar</button>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function updateCartItem(index) {
+            const newQuantity = parseInt(document.getElementById('editQuantity').value);
+            cart[index].quantity = newQuantity;
+            modal.style.display = 'none';
+            renderCart();
+        }
+
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function showProfile() {
+            modalTitle.textContent = 'Mi Perfil';
+            modalContent.innerHTML = `
+                <p>Número de cliente: ${user.id}</p>
+                <p>Nombre: ${user.firstName} ${user.lastName}</p>
+                <p>Email: ${user.email}</p>
+                <p>Teléfono: ${user.phone}</p>
+                <h3>Direcciones:</h3>
+                <ul id="addressList">
+                    ${user.addresses.map((address, index) => `
+                        <li>
+                            ${address}
+                            <button onclick="editAddress(${index})">Editar</button>
+                            <button onclick="removeAddress(${index})">Eliminar</button>
+                        </li>
+                    `).join('')}
+                </ul>
+                <button onclick="addAddress()">Agregar dirección</button>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function editAddress(index) {
+            const address = user.addresses[index];
+            modalContent.innerHTML = `
+                <label for="editAddress">Editar dirección:</label>
+                <input type="text" id="editAddress" value="${address}">
+                <button onclick="updateAddress(${index})">Actualizar</button>
+            `;
+        }
+
+        function updateAddress(index) {
+            const newAddress = document.getElementById('editAddress').value;
+            user.addresses[index] = newAddress;
+            showProfile();
+        }
+
+        function removeAddress(index) {
+            user.addresses.splice(index, 1);
+            showProfile();
+        }
+
+        function addAddress() {
+            modalContent.innerHTML = `
+                <label for="newAddress">Nueva dirección:</label>
+                <input type="text" id="newAddress">
+                <button onclick="saveNewAddress()">Guardar</button>
+            `;
+        }
+
+        function saveNewAddress() {
+            const newAddress = document.getElementById('newAddress').value;
+            user.addresses.push(newAddress);
+            showProfile();
+        }
+
+        function showOrders() {
+            modalTitle.textContent = 'Mis Órdenes';
+            modalContent.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orders.map(order => `
+                            <tr>
+                                <td>${order.id}</td>
+                                <td>${order.date}</td>
+                                <td>$${order.total.toFixed(2)}</td>
+                                <td>${order.status}</td>
+                                <td><button onclick="showOrderDetails('${order.id}')">Ver detalles</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function showOrderDetails(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            modalTitle.textContent = `Detalles de la Orden ${order.id}`;
+            modalContent.innerHTML = `
+                <p>Fecha: ${order.date}</p>
+                <p>Estado: ${order.status}</p>
+                <h3>Productos:</h3>
+                <ul>
+                    ${order.items.map(item => {
+                        const product = products.find(p => p.id === item.productId);
+                        return `<li>${product.description} - Cantidad: ${item.quantity}</li>`;
+                    }).join('')}
+                </ul>
+                <p>Total: $${order.total.toFixed(2)}</p>
+            `;
+        }
+
+        function logout() {
+            alert('Sesión cerrada');
+        }
+
+        function toggleDropdown() {
+            document.getElementById("userDropdown").classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.icon')) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        function showProducts() {
+            mainContent.innerHTML = `
+                <div class="search-filter">
+                    <input type="text" id="searchInput" placeholder="Buscar productos..." oninput="filterProducts()">
+                    <select id="categoryFilter" onchange="filterProducts()">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+                <div class="product-list" id="productList"></div>
+            `;
+            populateCategoryFilter();
+            renderProducts();
+        }
+
+        populateCategoryFilter();
+        renderProducts();
+    </script>
+</body>
+</html>

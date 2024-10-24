@@ -1,0 +1,30 @@
+
+<style>
+
+.cta-section {
+    background-color: #f7f9fa;
+    padding: 4rem 0;
+    text-align: center;
+}
+.cta-button {
+    display: inline-block;
+    background-color: #1DA1F2;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.cta-button:hover {
+    background-color: #0c85d0;
+    transform: scale(1.05);
+}
+</style>
+
+<section class="cta-section">
+    <div class="">
+        <h2 class="mb-4">{{ landing.cta_title }}</h2>
+        <p class="mb-4">{{ landing.cta_text }}</p>
+        <a href="{{ landing.cta_btn_url }}" class="cta-button">{{ landing.cta_btn_label }}</a>
+    </div>
+</section>

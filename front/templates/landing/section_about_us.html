@@ -1,0 +1,74 @@
+
+
+<style>
+  /* Additional styles for new sections */
+  .about-us {
+        background-color: #f7f9fa;
+        padding: 4rem 0;
+    }
+    .about-us-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 15px;
+    }
+    .about-us-image {
+        flex: 1;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    .about-us-image img {
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
+    .about-us-image:hover img {
+        transform: scale(1.05);
+    }
+    .about-us-text {
+        flex: 1;
+        
+    }
+    @media (max-width: 768px) {
+    .about-us-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-us-image {
+        margin-bottom: 1rem;
+    }
+
+    .about-us-image img {
+        width: 80%; /* Haz la imagen más pequeña en dispositivos móviles */
+        margin: 0 auto;
+    }
+}
+
+</style>
+
+<section class="about-us">
+    <div class="">
+        <div class="about-us-content">
+            <div class="about-us-image">
+                <img src="{% if landing.about_us_image %}{{ landing.about_us_image.url }}{% else %}https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="Sobre Nosotros">
+ 
+            </div>
+            <div class="about-us-text">
+                <h3>{{ landing.about_us_title }}</h3>
+
+                {%  if landing.about_us_text_1 %}
+                    <p>{{ landing.about_us_text_1 }}</p>
+                {%  endif %}
+                    
+                {%  if landing.about_us_text_2 %}
+                <p>{{  landing.about_us_text_2 }}</p>
+                {%  endif %}
+
+                {%  if landing.about_us_text_3 %}
+                <p>{{  landing.about_us_text_3 }}</p>
+                {%  endif %}
+            </div>
+        </div>
+    </div>
+</section>

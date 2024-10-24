@@ -1,0 +1,66 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+
+{% endblock %}
+
+{% block extra_script %}
+
+<script>
+
+
+function showOrders() {
+    modalTitle.textContent = 'Mis Órdenes';
+    modalContent.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${orders.map(order => `
+                    <tr>
+                        <td>${order.id}</td>
+                        <td>${order.date}</td>
+                        <td>$${order.total.toFixed(2)}</td>
+                        <td>${order.status}</td>
+                        <td><button onclick="showOrderDetails('${order.id}')">Ver detalles</button></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    modal.style.display = 'block';
+}
+
+function showOrderDetails(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    modalTitle.textContent = `Detalles de la Orden ${order.id}`;
+    modalContent.innerHTML = `
+        <p>Fecha: ${order.date}</p>
+        <p>Estado: ${order.status}</p>
+        <h3>Productos:</h3>
+        <ul>
+            ${order.items.map(item => {
+                const product = products.find(p => p.id === item.productId);
+                return `<li>${product.description} - Cantidad: ${item.quantity}</li>`;
+            }).join('')}
+        </ul>
+        <p>Total: $${order.total.toFixed(2)}</p>
+    `;
+}
+
+
+</script>
+
+{% endblock %}
+
+

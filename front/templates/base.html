@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PantuTienda{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/button_order_ok.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}">
+
+    {% block extra_head %}
+
+    {% endblock %}
+
+</head>
+<body>
+    <div style="padding: 5px;">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img src="{% static 'logo.png' %}" alt="Logo" >
+                </a>
+        
+                <div class="d-flex align-items-center">
+                    {% if request.user.is_authenticated %}
+                        <!-- Mostrar productos y carrito solo si está autenticado -->
+                        <a href="{% url 'productos' %}" class="nav-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </a>
+                        <a href="{% url 'carrito' %}" class="nav-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+        
+                        <!-- Dropdown con perfil, pedidos y logout -->
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-bars"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li class="dropdown-icons">
+                                    <a class="btn icon-btn" href="#" id="profileButton">
+                                        <i class="fas fa-user-circle"></i>
+                                        <span>Perfil</span>
+                                    </a>
+                                    <!-- Agrega un atributo data-url con la URL de pedidos -->
+                                    <a class="btn icon-btn" href="#" id="pedidosButton" data-url="{% url 'pedidos_view' %}">
+                                        <i class="fas fa-list"></i>
+                                        <span>Pedidos</span>
+                                    </a>
+                                    {% if request.user.is_staff %}
+                                        <a href="/app/" class="btn btn-warning">
+                                            <i class="fas fa-cogs"></i> Admin Panel
+                                        </a>
+                                    {% endif %}
+
+
+                                    <a class="btn icon-btn text-danger" href="{% url 'custom_logout' %}">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Cerrar sesión</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                    <a href="#" class="btn icon-btn text-success nav-icon" id="loginButton">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        
+        
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div style="background-color: rgb(161, 247, 219);" class="text-dark alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <main class="container">
+            {% block content %}{% endblock %}
+
+        <!-- Modal de Perfil -->
+        <div id="profileModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeProfileModal">&times;</span>
+                <div class="profile-header text-center">
+                    <img src="{% static 'img/user_man.png' %}" alt="Usuario" class="profile-image">
+                    <h4 id="profileName">{{ usuario }}</h4>
+                    <hr>
+                    <p id="profileClientNumber">Nº : {{ numero_usuario }}</p>
+                    <p id="profileClientNumber"><b>{{ tipo_cliente }}</b></p>
+                </div>
+                <div class="profile-actions d-flex justify-content-around mt-3">
+                    <a href="https://wa.me/{{ link_contacto }}?text={{ mensaje|urlencode }}" class="btn icon-btn" target="_blank" aria-label="Enviar mensaje por WhatsApp">
+                        <i class="fas fa-envelope"></i>
+                        <span>Mensaje</span>
+                    </a>
+                    
+                    <!-- <a href="#" class="btn icon-btn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a> -->
+                    <a href="#" class="btn icon-btn" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="fas fa-key"></i>
+                        <span>Cambiar Clave</span>
+                    </a>
+
+                    <!-- Modal de Cambiar Clave -->
+                    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="changePasswordModalLabel">Cambiar Clave</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="changePasswordForm" method="POST" action="{% url 'change_password' %}">
+                                        {% csrf_token %}
+                                        
+                                        <!-- Contraseña actual -->
+                                        <div class="mb-3">
+                                            <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                                            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                                        </div>
+
+                                        <!-- Nueva contraseña -->
+                                        <div class="mb-3">
+                                            <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                                            <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                                            <!-- Span para mostrar los requisitos de la contraseña -->
+                                            <span id="passwordRequirements" class="text-muted small">
+                                                La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número.
+                                            </span>
+                                        </div>
+
+                                        <!-- Confirmar nueva contraseña -->
+                                        <div class="mb-3">
+                                            <label for="confirmNewPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                                            <input type="password" class="form-control" id="confirmNewPassword" name="confirm_new_password" required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100">Cambiar Clave</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                
+                
+                
+            </div>
+        </div>
+
+        <!-- Modal de pedidos -->
+        <div id="pedidosModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 class="mb-3">Mis Pedidos</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th># Pedido</th>
+                                <th>Importe Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedidosTableBody">
+                            <!-- Aquí se insertan los pedidos dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Modal de pedidos -->
+        <div id="pedidosModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 class="mb-3">Mis Pedidos</h2>
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th># Pedido</th>
+                                <th>Importe Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedidosTableBody">
+                            <!-- Aquí se insertan los pedidos dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modales de Login y Registro -->
+
+        <!-- Modal de Login -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Iniciar Sesión</h2>
+                <form method="POST" action="{% url 'login' %}" class="mt-4">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Usuario" required>
+                        <small class="text-muted">Respetando mayúsculas y minúsculas.</small>
+                    </div>
+        
+                    <div class="mb-4">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required>
+                        <small class="text-muted">Introduce tu contraseña.</small>
+                    </div>
+        
+                    <button type="submit" class="btn btn-dark w-100 mt-3" id="loginButton">
+                        Ingresar 🚀
+                    </button>
+                </form>
+                <p class="mt-3">¿No tienes una cuenta? 
+                    <a href="#" id="openRegisterModal" class="text-primary">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Modal de Registro -->
+        <div id="registerModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Registrarse</h2>
+                <form method="POST" action="{% url 'registro' %}" class="mt-4">
+                    {% csrf_token %}
+                
+                    <div class="mb-4">
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Usuario" required>
+                        <small class="text-muted">El nombre de usuario no puede contener espacios y debe respetar mayúsculas y minúsculas.</small>
+                    </div>
+                
+                    <div class="mb-4">
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Correo Electrónico" required>
+                        <small class="text-muted">Recibirás un enlace de confirmación en este correo.</small>
+                    </div>
+                
+                    <div class="mb-4">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required>
+                        <small class="text-muted">Introduce una contraseña segura.</small>
+                    </div>
+                
+                    <div class="mb-4">
+                        <input type="password" name="password2" id="password2" class="form-control" placeholder="Repite la Contraseña" required>
+                        <small class="text-muted">Vuelve a introducir la misma contraseña.</small>
+                    </div>
+                
+                    <button type="submit" class="btn btn-dark w-100 mt-3" id="registerButton">
+                        Registrarse 🚀
+                    </button>
+                    
+                    <!-- Botón para volver al login -->
+                    <p class="mt-3">¿Ya tienes cuenta?
+                        <a href="#" id="openLoginModal" class="text-primary">Inicia Sesión aquí</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    </main>
+
+    <!-- <script src="{% static 'js/theme.js' %}"></script> -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/login.js' %}"></script>
+    <script src="{% static 'jquery/jquery.js' %}"></script>
+    
+    
+    <script>
+        const newPasswordInput = document.getElementById('newPassword');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+
+        // Función para validar los requisitos de la contraseña
+        newPasswordInput.addEventListener('input', function() {
+            const password = newPasswordInput.value;
+            let message = 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número.';
+
+            // Validación básica
+            if (password.length >= 8 
+                && /[A-Z]/.test(password) 
+                && /[a-z]/.test(password) 
+                && /\d/.test(password)) {
+                message = 'La contraseña es válida.';
+            }
+
+            passwordRequirements.textContent = message;
+        });
+    </script>
+
+    <!-- Bloque para scripts adicionales -->
+    {% block extra_scripts %}
+    {% endblock %}
+
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    
+</body>
+</html>

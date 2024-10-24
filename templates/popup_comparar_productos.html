@@ -1,0 +1,143 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+    <div class="container-fluid mt-3">
+        <div class="row mb-3">
+            <div class="col-6">
+                <h1>Dashboard de Productos</h1>
+                <button class="btn btn-secondary" onclick="history.back()">Volver</button>
+            </div>
+            <div class="col-6 text-end">
+                <button class="btn btn-success" onclick="descargarExcel()">Descargar Excel 📥</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card h-100" style="max-height: 350px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Distribución de Productos</h5>
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100" style="max-height: 350px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Comparación de Precios</h5>
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio Anterior</th>
+                            <th>Precio Actual</th>
+                            <th>Diferencia (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Filas de la tabla generadas con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const productos = JSON.parse(`{{ productos_json|safe }}`);
+
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+            }).format(value);
+        }
+
+        // Cargar la tabla con los datos
+        const tableBody = document.getElementById('productTableBody');
+        productos.forEach(item => {
+            const row = `
+                <tr>
+                    <td>${item.producto}</td>
+                    <td>$${formatCurrency(item.costo_anterior)}</td>
+                    <td>$${formatCurrency(item.precio_actual)}</td>
+                    <td>
+                        ${item.diferencia > 0 ? 
+                            `<span style="color: red;">${item.diferencia.toFixed(2)} % ↑</span>` :
+                            item.diferencia < 0 ? 
+                            `<span style="color: green;">${item.diferencia.toFixed(2)} % ↓</span>` :
+                            `<span>Sin cambio</span>`
+                        }
+                    </td>
+                </tr>`;
+            tableBody.innerHTML += row;
+        });
+
+        // Preparar datos para los gráficos
+        const labels = productos.map(item => item.producto);
+        const precios = productos.map(item => item.precio_actual);
+        const costosAnteriores = productos.map(item => item.costo_anterior);
+
+        // Gráfico de Torta
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: precios,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                }],
+            },
+        });
+
+        // Gráfico de Barras
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Precio Anterior',
+                        data: costosAnteriores,
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    },
+                    {
+                        label: 'Precio de Compra',
+                        data: precios,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    }
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Precio ($)',
+                        },
+                    },
+                },
+            },
+        });
+
+        function descargarExcel() {
+            const url = `{% url 'descargar_excel' compra.id %}`;
+            window.location.href = url;
+        }
+    </script>
+{% endblock %}

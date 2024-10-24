@@ -1,0 +1,64 @@
+<style>
+
+ 
+.testimonials {
+    padding: 4rem 0;
+}
+.testimonial-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.testimonial-content {
+    position: relative;
+    padding-left: 2rem;
+}
+.testimonial-content::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -10px;
+    font-size: 4rem;
+    color: #1DA1F2;
+    opacity: 0.5;
+}
+</style>
+
+<section class="testimonials">
+    <div class="">
+        <h2 class="text-center mb-4">{{ landing.testimonials_title }}</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"{{ landing.comment_1 }}"</p>
+                    </div>
+                    <p class="font-weight-bold mt-3">- {{ landing.name_comment_1 }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"{{ landing.comment_2 }}"</p>
+                    </div>
+                    <p class="font-weight-bold mt-3">- {{ landing.name_comment_2 }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"{{ landing.comment_3 }}"</p>
+                    </div>
+                    <p class="font-weight-bold mt-3">- {{ landing.name_comment_3 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

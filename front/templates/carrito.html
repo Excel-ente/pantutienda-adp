@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Carrito de Compras{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .cart-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    .cart-title {
+        color: #1DA1F2;
+        margin-bottom: 1.5rem;
+    }
+    .cart-table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    }
+    .cart-table thead th {
+        border-top: none;
+        border-bottom: 2px solid ;
+        color: #14171A;
+    }
+    .cart-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .cart-table tbody tr:hover {
+        transform: translateY(-3px);
+        background-color: rgba(246, 201, 129, 0.737);
+        box-shadow: 0 4px 6px rgba(246, 201, 129, 0.5);
+    }
+
+    /* Para opacar el resto del contenido cuando se hace hover en una fila */
+    .cart-table:hover tbody tr {
+        opacity: 0.3; /* Reducimos la opacidad de todas las filas */
+    }
+
+    /* Restauramos la opacidad completa de la fila sobre la que se está haciendo hover */
+    .cart-table tbody tr:hover {
+        opacity: 1;
+    }
+
+    .cart-table td {
+        vertical-align: middle;
+    }
+    .product-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .quantity-btn {
+        background-color: #db9201;
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .quantity-btn:hover {
+        background-color: #db9201;
+    }
+    .quantity-input {
+        width: 40px;
+        text-align: center;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin: 0 5px;
+    }
+
+    .cart-total {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #14171A;
+        margin-top: 1.5rem;
+    }
+    .cart-actions {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px; /* Ajuste para dar espacio entre los botones */
+    }
+
+    .btn-order,
+    .btn-continue {
+        font-size: 16px;
+        padding: 10px 20px; /* Ajuste del padding para evitar botones demasiado grandes */
+        border-radius: 8px; /* Un borde redondeado más consistente */
+        width: auto; /* Evitar que los botones ocupen todo el ancho */
+        min-width: 150px; /* Asegura que los botones tengan un tamaño mínimo coherente */
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px; /* Espacio entre el icono y el texto */
+    }
+
+    .btn-order i,
+    .btn-continue i {
+        font-size: 18px;
+    }
+
+    .btn-order {
+        background-color: #db9201;
+        border-color: #db9201;
+    }
+
+    .btn-order:hover {
+        background-color: #543a04;
+        border-color: #db9201;
+        transform: translateY(-2px);
+    }
+
+    .btn-continue {
+        color: #1d80f2;
+        border: 2px solid #026387;
+        background-color: transparent;
+    }
+
+    .btn-continue:hover {
+        background-color: #026387;
+        color: rgb(143, 194, 236);
+    }
+    
+    .empty-cart {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .quantity-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .quantity-btn {
+        background-color: #db9201;
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+    }
+
+
+
+    /* Botón de edición */
+    .remove-btn {
+        background-color: #dc3545;
+        border: none;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-right: 10px;
+    }
+
+    .remove-btn:hover {
+        background-color: #a71d2a;
+        transform: scale(1.1);
+    }
+
+    .edit-btn i {
+        font-size: 18px;
+    }
+
+
+    /* Botón de edición */
+    .edit-btn {
+        background-color: #f2991d;
+        border: none;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-right: 10px;
+    }
+
+    .edit-btn:hover {
+        background-color: #db9201;
+        transform: scale(1.1);
+    }
+
+    .edit-btn i {
+        font-size: 18px;
+    }
+
+    /* Alineación de botones en las acciones */
+    .action-btns {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+
+
+    .modal-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .w-45 {
+        width: 45%;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background-color: #a71d2a;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .modal-content h3 {
+        margin-bottom: 10px;
+        color: #dc3545;
+    }
+
+    /* Ajustar estilos en dispositivos móviles */
+    @media (max-width: 768px) {
+        /* Oculta los elementos decorativos en móviles */
+        .cart-container {
+            padding: 15px 0px;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        .container {
+            gap: 5px; /* Reducir el espacio entre productos */
+        }
+
+        .product-card {
+            border-radius: 0;
+            box-shadow: none;
+        }
+    }
+
+</style>
+
+<div class="container cart-container">
+    <h2 class="cart-title"><i class="fas fa-shopping-cart"></i>&nbsp; Carrito de Compras</h2>
+    <hr>
+    {% if items %}
+        <div class="table-responsive">
+            <table class="table cart-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td data-label="Producto">
+                                <div class="d-flex align-items-center">
+                                    <img src="{% if item.producto.imagen %}{{ item.producto.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ item.producto.nombre }}" class="product-image mr-3">
+                                    <span>&nbsp; {{ item.producto.nombre }}</span>
+                                </div>
+                            </td>
+                            <td data-label="Cantidad">{{ item.cantidad|intcomma }}</td>
+                            <td data-label="Precio Unitario">${{ item.precio_unitario|intcomma }}</td>
+                            <td data-label="Subtotal">${{ item.subtotal|intcomma  }}</td>
+                            <td data-label="Acciones">
+                                <button class="edit-btn" data-item-id="{{ item.id }}" data-current-quantity="{{ item.cantidad }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{% url 'carrito' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" class="remove-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+        </div>
+
+        <div class="cart-total">
+            Total: ${{ total }}
+        </div>
+
+        <div class="cart-actions">
+            <a href="{% url 'productos' %}" class="btn btn-outline-primary btn-continue">
+                <i class="fas fa-arrow-left mr-2"></i>Seguir Comprando
+            </a>
+            <a href="#" class="btn btn-primary btn-order" id="confirmOrderButton">
+                Realizar Pedido <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    {% else %}
+        <p class="empty-cart">Tu carrito está vacío. <a href="{% url 'productos' %}">¡Empieza a comprar ahora!</a></p>
+    {% endif %}
+</div>
+
+<!-- Modal para Editar Cantidad -->
+<div id="editQuantityModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Editar Cantidad</h3>
+        <form method="POST" action="{% url 'actualizar_carrito' %}">
+            {% csrf_token %}
+            <input type="hidden" name="item_id" id="modalItemId">
+            <div class="quantity-container">
+                <button type="button" id="decreaseQuantity" class="quantity-btn">-</button>
+                <input type="number" name="quantity" id="modalQuantityInput" value="1" min="1" class="quantity-input">
+                <button type="button" id="increaseQuantity" class="quantity-btn">+</button>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Confirmación de Eliminación -->
+<div id="deleteConfirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>¿Eliminar artículo?</h3>
+        <p>¿Estás seguro de que deseas eliminar este artículo del carrito?</p>
+        <div class="modal-actions">
+            <button id="confirmDelete" class="btn btn-danger w-45">Eliminar</button>
+            <button id="cancelDelete" class="btn btn-secondary w-45">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Pedido -->
+<div id="confirmOrderModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Confirmar Pedido</h3>
+        <ul id="orderItemsList"></ul>
+        <p id="orderTotal"></p>
+
+        <!-- Nuevo: Sección para seleccionar la dirección -->
+        <h4>Selecciona una dirección de entrega:</h4>
+        <div id="addressesList"></div>
+
+        <div class="modal-actions">
+            {% include 'button_order.html' %}
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Variables de los modales
+    const modals = {
+        confirmOrder: document.getElementById('confirmOrderModal'),
+        editQuantity: document.getElementById('editQuantityModal'),
+        deleteConfirmation: document.getElementById('deleteConfirmationModal'),
+    };
+
+    const elements = {
+        orderItemsList: document.getElementById('orderItemsList'),
+        orderTotal: document.getElementById('orderTotal'),
+        confirmOrderButton: document.getElementById('confirmOrderButton'),
+        confirmOrder: document.getElementById('confirmOrder'),
+        cancelOrder: document.getElementById('cancelOrder'),
+        modalItemId: document.getElementById('modalItemId'),
+        modalQuantityInput: document.getElementById('modalQuantityInput'),
+        decreaseQuantity: document.getElementById('decreaseQuantity'),
+        increaseQuantity: document.getElementById('increaseQuantity'),
+        confirmDelete: document.getElementById('confirmDelete'),
+        cancelDelete: document.getElementById('cancelDelete'),
+    };
+
+    let itemToDelete = null;
+
+    // Función para mostrar los productos en el modal de confirmación de pedido
+    function renderOrderItems(items) {
+        elements.orderItemsList.innerHTML = items.map(item =>
+            `<li>${item.cantidad} x ${item.producto} - $${item.subtotal.toFixed(2)}</li>`
+        ).join('');
+    }
+
+    function renderAddresses(direcciones) {
+        const addressesList = document.getElementById('addressesList');
+        if (direcciones.length > 0) {
+            addressesList.innerHTML = direcciones.map(direccion =>
+                `<div>
+                    <input type="radio" name="direccion" value="${direccion.id}" required>
+                    <label>${direccion.direccion}</label>
+                </div>`
+            ).join('');
+        } else {
+            addressesList.innerHTML = '<p>No tienes direcciones registradas.</p>';
+        }
+    }
+
+
+
+    // Evento al hacer clic en "Realizar Pedido"
+    elements.confirmOrderButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch("{% url 'confirmar_pedido_view' %}", {
+                method: 'GET',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+            });
+
+            const data = await response.json();
+            if (data.items) {
+                renderOrderItems(data.items);
+                elements.orderTotal.textContent = `Total: $${data.total.toFixed(2)}`;
+                renderAddresses(data.direcciones);
+                modals.confirmOrder.classList.add('show');  // Abrir el modal
+            } else {
+                console.error('Error al cargar el pedido');
+            }
+
+        } catch (error) {
+            console.error('Error al cargar el pedido:', error);
+        }
+    });
+
+        // Confirmación del pedido (POST request)
+    elements.confirmOrder.addEventListener('click', async () => {
+        const selectedAddress = document.querySelector('input[name="direccion"]:checked');
+        if (!selectedAddress) {
+            alert('Por favor, selecciona una dirección de entrega.');
+            return;
+        }
+
+        try {
+            const response = await fetch("{% url 'confirmar_pedido_view' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken(),
+                },
+                body: JSON.stringify({ direccion_id: selectedAddress.value }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                
+                // Cerrar el modal y mostrar animación si corresponde
+                modals.confirmOrder.classList.remove('show');
+
+                // Iniciar animación del botón (si aplica)
+                const button = document.querySelector('.order');
+                if (button && !button.classList.contains('animate')) {
+                    button.classList.add('animate');
+                    setTimeout(() => {
+                        button.classList.remove('animate');
+                        alert('Pedido confirmado. ¡Gracias por tu compra!');
+                        location.reload();  // Recargar para reflejar el nuevo estado
+                    }, 1000);  // Ajusta el tiempo según la duración de tu animación
+                } else {
+                    alert('Pedido confirmado. ¡Gracias por tu compra!');
+                    location.reload();
+                }
+                location.reload();
+            } else {
+                console.error(data.error || 'Error al confirmar el pedido');
+            }
+        } catch (error) {
+            console.error('Error al confirmar el pedido:', error);
+        }
+    });
+
+    elements.cancelOrder.addEventListener('click', () => modals.confirmOrder.classList.remove('show'));
+
+    // Funciones para edición de cantidad
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            elements.modalItemId.value = button.dataset.itemId;
+            elements.modalQuantityInput.value = button.dataset.currentQuantity;
+            modals.editQuantity.classList.add('show');
+        });
+    });
+
+    elements.increaseQuantity.addEventListener('click', () => {
+        elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) + 1;
+    });
+
+    elements.decreaseQuantity.addEventListener('click', () => {
+        if (elements.modalQuantityInput.value > 1) {
+            elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) - 1;
+        }
+    });
+
+    // Funciones para confirmación de eliminación
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            itemToDelete = button.closest('form').querySelector('input[name="item_id"]').value;
+            modals.deleteConfirmation.classList.add('show');
+        });
+    });
+
+    elements.confirmDelete.addEventListener('click', () => {
+        if (itemToDelete) {
+            const form = document.querySelector(`input[value="${itemToDelete}"]`).closest('form');
+            form.submit();
+        }
+    });
+
+    elements.cancelDelete.addEventListener('click', () => modals.deleteConfirmation.classList.remove('show'));
+
+    // Obtener token CSRF
+    function getCsrfToken() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') return value;
+        }
+        return '';
+    }
+});
+
+</script>
+    
+{% endblock %}

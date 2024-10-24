@@ -1,0 +1,243 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+
+{% if cards_simple == True %}
+
+    <!-- Colocamos las tarjetas antes del formulario -->
+    <div class="cards-container">
+        <div class="card_custom">
+            <h2>{{ etiqueta_1 }}</h1>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_1 }}</span>
+                </div>
+
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_2 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_2 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_3 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_3 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_4 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_4 }}</span>
+                </div>
+            </div>
+        </div>
+        {{ block.super }}
+    </div>
+
+    <!-- Añadimos el estilo interno para mejorar la presentación -->
+    <style>
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card_custom {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: left;
+            flex: 1 1 calc(25% - 20px); 
+            box-sizing: border-box;
+            min-width: 250px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .card_custom {
+                flex: 1 1 calc(33.333% - 20px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card_custom {
+                flex: 1 1 calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card_custom {
+                flex: 1 1 100%;
+            }
+        }
+
+        .card_custom h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .metric-value {
+   
+            color: #222;
+        }
+    </style>
+
+{% elif cards_doble == True %}
+
+
+    <!-- Colocamos las tarjetas antes del formulario -->
+    <div class="cards-container">
+        <div class="card_custom">
+            <h2>{{ etiqueta_1 }}</h1>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_1 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">{{ sub_val_etiqueta_1 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_2 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_2 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">{{ sub_val_etiqueta_2 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_3 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_3 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">{{ sub_val_etiqueta_3 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card_custom">
+            <h2>{{ etiqueta_4 }}</h2>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value">{{ val_etiqueta_4 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value">{{ sub_val_etiqueta_4 }}</span>
+                </div>
+            </div>
+        </div>
+        {{ block.super }}
+    </div>
+
+    <!-- Añadimos el estilo interno para mejorar la presentación -->
+    <style>
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card_custom {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: left;
+            flex: 1 1 calc(25% - 20px); 
+            box-sizing: border-box;
+            min-width: 250px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .card_custom {
+                flex: 1 1 calc(33.333% - 20px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card_custom {
+                flex: 1 1 calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card_custom {
+                flex: 1 1 100%;
+            }
+        }
+
+        .card_custom h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .metric-value {
+   
+            color: #222;
+        }
+    </style>
+    
+{% else %}
+{{ block.super }}
+{% endif %}
+
+{% endblock %}

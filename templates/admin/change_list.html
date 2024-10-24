@@ -1,0 +1,265 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+
+{% if cards_simple == True %}
+
+    <div class="cards-container" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; margin-bottom: 20px;">
+        <div class="card">
+            <h4>{{ etiqueta_1 }}</h4>
+            <p>{{ val_etiqueta_1 }}</p>
+        </div>
+        <div class="card">
+            <h4>{{ etiqueta_2 }}</h4>
+            <p>{{ val_etiqueta_2 }}</p>
+        </div>
+        <div class="card">
+            <h4>{{ etiqueta_3 }}</h4>
+            <p>{{ val_etiqueta_3 }}</p>
+        </div>
+        <div class="card">
+            <h4>{{ etiqueta_4 }}</h4>
+            <p>{{ val_etiqueta_4 }}</p>
+        </div>
+        
+        <!-- Esto asegura que los filtros, la tabla y el import/export sigan presentes -->
+        {{ block.super }}
+    </div>
+
+    <!-- Añadimos el estilo interno para mejorar la responsividad -->
+    <style>
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1 1 calc(25% - 20px); /* Esto permite que cada tarjeta ocupe el 25% del ancho con espacio entre ellas */
+            box-sizing: border-box;
+            min-width: 200px;
+        }
+
+        /* Media queries para diferentes tamaños de pantalla */
+        @media (max-width: 1200px) {
+            .card {
+                flex: 1 1 calc(33.333% - 20px); /* En pantallas medianas, 3 tarjetas por fila */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                flex: 1 1 calc(50% - 20px); /* En pantallas pequeñas, 2 tarjetas por fila */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card {
+                flex: 1 1 100%; /* En pantallas muy pequeñas, 1 tarjeta por fila */
+            }
+        }
+
+        .card h4 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+    </style>
+    
+{% elif  cards_doble == True %}
+
+
+    <style>
+        body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f0f2f5;
+                margin: 0;
+        
+                box-sizing: border-box;
+            }
+            .cards-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .card {
+                background-color: #ffffff;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+            .card-emoji {
+                font-size: 2rem;
+            }
+            .card-title {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #333;
+                text-align: right;
+            }
+            .card-metrics {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .metric {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .metric-label {
+                font-size: 0.9rem;
+                color: #666;
+            }
+            .metric-value {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #0066cc;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 1200px) {
+                .cards-container {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
+            @media (max-width: 900px) {
+                .cards-container {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+            @media (max-width: 600px) {
+                .cards-container {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 10px;
+                }
+                .card {
+                    padding: 10px;
+                }
+                .card-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    margin-bottom: 10px;
+                    padding: 5px;
+                    background-color: rgba(0,0,0,0);
+                }
+                .card-emoji {
+                    display: none;
+                    font-size: 1.5rem;
+                    margin-bottom: 2px;
+                }
+                .card-title {
+                    font-size: 0.9rem;
+                    text-align: left;
+                }
+                .card-metrics {
+                    gap: 5px;
+                }
+                .metric {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+                .metric-label {
+                    font-size: 0.7rem;
+                }
+                .metric-value {
+                    font-size: 0.9rem;
+                }
+            }
+    </style>
+    <div class="cards-container">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-emoji">{{ emoji_1 }}</span>
+                <h3 class="card-title">{{ etiqueta_1 }}</h3>
+            </div>
+            <div class="card-metrics">
+                <div class="metric">
+                    <span class="metric-label">{{ label_val_etiqueta_1 }}</span>
+                    <span class="metric-value">{{ val_etiqueta_1 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">{{ label_sub_val_etiqueta_1 }}</span>
+                    <span class="metric-value">{{ sub_val_etiqueta_1 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-emoji">{{ emoji_2 }}</span>
+                <h3 class="card-title">{{ etiqueta_2 }}</h3>
+            </div>
+            <div class="card-metrics">
+                <div class="metric">
+                    <span class="metric-label">{{ label_val_etiqueta_2 }}</span>
+                    <span class="metric-value">{{ val_etiqueta_2 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">{{ label_sub_val_etiqueta_2 }}</span>
+                    <span class="metric-value">{{ sub_val_etiqueta_2 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-emoji">{{ emoji_3 }}</span>
+                <h3 class="card-title">{{ etiqueta_3 }}</h3>
+            </div>
+            <div class="card-metrics">
+                <div class="metric">
+                    <span class="metric-label">{{ label_val_etiqueta_3 }}</span>
+                    <span class="metric-value">{{ val_etiqueta_3 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">{{ label_sub_val_etiqueta_3 }}</span>
+                    <span class="metric-value">{{ sub_val_etiqueta_3 }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-emoji">{{ emoji_4 }}</span>
+                <h3 class="card-title">{{ etiqueta_4 }}</h3>
+            </div>
+            <div class="card-metrics">
+                <div class="metric">
+                    <span class="metric-label">{{ label_val_etiqueta_4 }}</span>
+                    <span class="metric-value">{{ val_etiqueta_4 }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">{{ label_sub_val_etiqueta_4 }}</span>
+                    <span class="metric-value">{{ sub_val_etiqueta_4 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ block.super }}
+{% else %}
+{{ block.super }}
+{% endif %}
+
+{% endblock %}

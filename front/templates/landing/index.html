@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <style>
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    {% for section in secciones %}
+        {% if section.name == 'section_hero' %}
+            {% include "landing/section_hero.html" %}
+        {% elif section.name == 'section_category' %}
+            {% include "landing/section_category.html" %}
+        {% elif section.name == 'section_gallery' %}
+            {% include "landing/section_gallery.html" %}
+        {% elif section.name == 'about_us' %}
+            {% include "landing/section_about_us.html" %}
+        {% elif section.name == 'testimonials' %}
+            {% include "landing/section_testimonials.html" %}
+        {% elif section.name == 'features' %}
+            {% include "landing/section_features.html" %}
+        {% elif section.name == 'cta_section' %}
+            {% include "landing/section_cta_section.html" %}
+        {% elif section.name == 'newsletter' %}
+            {% include "landing/section_newsletter.html" %}
+        {% endif %}
+    {% endfor %}
+{% endblock %}

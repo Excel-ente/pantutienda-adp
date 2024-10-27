@@ -26,12 +26,12 @@ def habilitar_proveedor(request, id):
             messages.error(request, f'La cuenta comercial no se pudo crear. Detalles del error: {str(e)}')
 
         try:
-            
             send_mail_alta_proveedor(proveedor=proveedor_obj.usuario.username, email=proveedor_obj.usuario.email)
         except Exception as e:
             messages.error(request, f'La el mail no pudo enviarse. Detalles del error: {str(e)}')
 
             return redirect('admin:agenda_proveedor_changelist')
+        
         proveedor_obj.habilitado = True
         proveedor_obj.fecha_habilitacion = timezone.now()
         proveedor_obj.save()
@@ -68,12 +68,14 @@ def habilitar_cliente(request, id):
     if not cliente_obj.habilitado:
         try:
             crear_cuenta_comercial_cliente(cliente=cliente_obj)   
+            messages.info(request,'Cliente habilitado correctamente.')
         except Exception as e:
             messages.error(request, f'La cuenta comercial no se pudo crear. Detalles del error: {str(e)}')
 
         if mail_bienvenida:
             try:
                 send_mail_alta_cliente(cliente=cliente_obj.usuario.username, email=cliente_obj.usuario.email)
+                messages.info(request,'Email de bienvenida enviado correctamente.')
             except Exception as e:
                 messages.error(request, f'La el mail no pudo enviarse. Detalles del error: {str(e)}')
                 return redirect('admin:agenda_cliente_changelist')

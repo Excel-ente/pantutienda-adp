@@ -2,6 +2,7 @@ from django.db import models
 from inventario.models import Producto,ProductoPrecio
 from agenda.models import Cliente,DireccionEntregaCliente
 from django.core.exceptions import ValidationError
+from configuracion.envio_mails import send_mail_nuevo_pedido
 
 ESTADO_CHOICES = [
     ('abierto', 'Abierto'),
@@ -24,6 +25,15 @@ class Pedido(models.Model):
             raise ValidationError('El pedido no puede modificarse.')
         return super().clean()
     
+    # Sobrescribe el método save para detectar nuevos pedidos
+    def save(self, *args, **kwargs):
+        if self.pk is None and self.estado == 'abierto':
+            super().save(*args, **kwargs)  # Guarda primero para crear el ID del pedido
+            self.enviar_mail_nuevo_pedido()
+        else:
+            super().save(*args, **kwargs)
+
+
     def total(self):
         return sum(item.subtotal() for item in self.items.all())
 

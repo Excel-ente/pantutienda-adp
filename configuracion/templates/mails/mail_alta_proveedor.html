@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            /* Sombras más intensas y notables */
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            background-color: #f8f2ed;
+            border-color: #9c8b7c;
+        }
+        .card img {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .card h1 {
+            font-size: 32px;
+            color: #503d2c;
+            margin-bottom: 20px;
+        }
+        .card p {
+            font-size: 16px;
+            color: #251f19;
+        }
+        .card .divider {
+            margin: 20px 0;
+            border-top: 1px solid #ddd;
+        }
+        .card-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #786550;
+        }
+        .card-footer p {
+            color: #786550;
+        }
+
+        /* Estilos del botón */
+        .btn-ingresar {
+            background-color: #b58b00; /* Color dorado */
+            color: white; /* Texto blanco */
+            padding: 10px 20px; /* Espaciado interno */
+            text-decoration: none; /* Quitar subrayado */
+            border-radius: 8px; /* Bordes redondeados */
+            font-size: 16px; /* Tamaño de fuente */
+            display: inline-block; /* Comportamiento de botón */
+            border: none; /* Sin bordes externos */
+            text-align: center; /* Alinear texto */
+            font-weight: bold; /* Texto en negrita */
+            transition: background-color 0.3s ease; /* Transición para el hover */
+            margin-top: 15px;
+        }
+
+        /* Hover del botón */
+        .btn-ingresar:hover {
+            color: white; /* Texto blanco */
+            background-color: #8e6e00; /* Color dorado más oscuro */
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Header del correo con logo -->
+        <div class="email-header">
+            <img src="https://pantutienda.com/static/logo.png" alt="Logo">
+        </div>
+
+        <!-- Cuerpo del correo -->
+        <div class="email-body">
+            <h1>¡Tu alta como proveedor está lista!</h1>
+            <p>Hola {{ proveedor.nombre }},</p>
+            <p>Tu alta está lista y ya puedes comenzar a usar nuestra plataforma.</p>
+            <p>
+                También puedes ingresar al panel y ver los detalles completos desde nuestra home:
+                <br>
+                <a href="https://pantutienda.com/app/" target="_blank" class="btn-ingresar" style="color: white;">Ingresar a la plataforma</a>
+            </p>
+        </div>
+
+        <!-- Divider y Footer del correo -->
+        <div class="divider"></div>
+        <div class="card-footer">
+            <p>¡Saludos!<br>El equipo de PantuTienda.com</p>
+        </div>
+    </div>
+</body>
+</html>

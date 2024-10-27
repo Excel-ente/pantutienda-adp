@@ -7,7 +7,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 def generar_token_oauth():
     creds = None
-    CLIENT_SECRET_FILE = 'client_secret.json'
+    CLIENT_SECRET_FILE = 'configuracion/client_secret.json'
 
     # Revisar si ya existe un token
     if os.path.exists('token.json'):

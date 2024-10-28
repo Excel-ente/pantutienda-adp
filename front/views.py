@@ -348,9 +348,22 @@ def is_ip_blocked(ip):
     attempts = FailedLoginAttempt.objects.filter(ip_address=ip, attempt_time__gte=cutoff_time).count()
     return attempts >= 10
 
+def obtener_ip_real(request):
+    # Intenta obtener la IP del encabezado 'HTTP_X_FORWARDED_FOR', usado en configuraciones con proxy
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    if ip:
+        # El encabezado puede contener una lista de IPs, la primera es la IP real del cliente
+        ip = ip.split(',')[0].strip()
+    else:
+        # Si no está detrás de un proxy, usa 'REMOTE_ADDR' como fallback
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 # ------------------------------------------------------------------------------------------
 def custom_login(request):
-    ip = request.META.get('REMOTE_ADDR')
+
+    #ip = request.META.get('REMOTE_ADDR')
+    ip = obtener_ip_real(request)
 
     # Verifica si la IP está bloqueada
     if is_ip_blocked(ip):

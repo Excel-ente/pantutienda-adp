@@ -9,13 +9,16 @@ from googleapiclient.errors import HttpError
 from django.template.loader import render_to_string
 import environ
 
-
 # Inicializa django-environ para leer el archivo .env
 env = environ.Env()
 environ.Env.read_env()  # lee el archivo .env
 
 # Si modificas estos alcances, asegúrate de borrar el archivo token.json
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
+
+# Define la ruta de la plantilla de correo HTML
+TEMPLATE_PATH_PROVEEDOR = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_proveedor.html')
+TEMPLATE_PATH_CLIENTE = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_cliente.html')
 
 def get_credentials():
     creds = None
@@ -44,10 +47,6 @@ def get_credentials():
             token.write(creds.to_json())
     
     return creds
-
-# Define la ruta de la plantilla de correo HTML
-TEMPLATE_PATH_PROVEEDOR = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_proveedor.html')
-TEMPLATE_PATH_CLIENTE = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_cliente.html')
 
 def send_mail_alta_proveedor(proveedor, email):
     try:
@@ -80,7 +79,6 @@ def send_mail_alta_proveedor(proveedor, email):
     except HttpError as error:
         print(f'Error al enviar email al proveedor: {error}')
 
-
 def send_mail_alta_cliente(cliente, email):
     try:
         creds = get_credentials()
@@ -107,7 +105,6 @@ def send_mail_alta_cliente(cliente, email):
     except HttpError as error:
         print(f'Error al enviar email al usuario: {error}')
 
-
 def send_mail_nuevo_pedido(pedido):
     try:
         # Obtener las credenciales para Gmail
@@ -124,7 +121,7 @@ def send_mail_nuevo_pedido(pedido):
         # Crear el mensaje MIME
         message = MIMEMultipart('alternative')
         message['to'] = pedido.cliente.usuario.email
-        message['subject'] = f'Tienes un nuevo pedido #{pedido.id}'
+        message['subject'] = f'Pedido recibido! #{pedido.id}'
         message_html = MIMEText(html_content, 'html')
         message.attach(message_html)
 
@@ -138,4 +135,36 @@ def send_mail_nuevo_pedido(pedido):
     
     except HttpError as error:
         print(f'Error al enviar email al usuario: {error}')
-        
+
+
+
+def send_mail_pedido_confirmado(pedido):
+    try:
+        # Obtener las credenciales para Gmail
+        creds = get_credentials()
+        service = build('gmail', 'v1', credentials=creds)
+
+        # Renderizar la plantilla utilizando el sistema de plantillas de Django
+        html_content = render_to_string('mails/mail_pedido_confirmado.html', {
+            'pedido': pedido,
+            'items': pedido.items.all(),
+            'total': pedido.total(),
+        })
+
+        # Crear el mensaje MIME
+        message = MIMEMultipart('alternative')
+        message['to'] = pedido.cliente.usuario.email
+        message['subject'] = f'Pedido confirmado! #{pedido.id}'
+        message_html = MIMEText(html_content, 'html')
+        message.attach(message_html)
+
+        # Convertir el mensaje a base64
+        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+        # Enviar el correo utilizando la API de Gmail
+        create_message = {'raw': raw_message}
+        send_message = service.users().messages().send(userId="me", body=create_message).execute()
+        print(f'Mensaje enviado: {send_message["id"]}')
+    
+    except HttpError as error:
+        print(f'Error al enviar email al usuario: {error}')

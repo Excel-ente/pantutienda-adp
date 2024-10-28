@@ -26,12 +26,12 @@ class Pedido(models.Model):
         return super().clean()
     
     # Sobrescribe el método save para detectar nuevos pedidos
-    def save(self, *args, **kwargs):
-        if self.pk is None and self.estado == 'abierto':
-            super().save(*args, **kwargs)  # Guarda primero para crear el ID del pedido
-            self.enviar_mail_nuevo_pedido()
-        else:
-            super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.pk is None and self.estado == 'abierto':
+    #         super().save(*args, **kwargs)
+    #         send_mail_nuevo_pedido(self)
+    #     else:
+    #         super().save(*args, **kwargs)
 
 
     def total(self):

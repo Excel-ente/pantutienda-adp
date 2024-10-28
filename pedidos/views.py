@@ -74,8 +74,6 @@ def finalizar_armado_pedido(request, id):
 
 
 
-
-
 # -----------------------------------------------------------------------------------------
 # vistas del carrito ----------------------------------------------------------------------
 
@@ -118,7 +116,7 @@ def carrito(request):
         except Exception as e:
             messages.error(request, f'Error al eliminar el producto: {str(e)}')
 
-        return redirect('carrito')
+        return redirect('productos')
 
 @login_required
 @require_POST
@@ -179,7 +177,7 @@ def agregar_al_carrito(request):
     if not creado:
         return JsonResponse({'status': 'error', 'message': 'El producto ya está en el carrito'}, status=400)
 
-    return redirect('carrito')
+    return redirect('productos')
 
 @login_required
 @require_POST

@@ -157,7 +157,7 @@ class CompraAdmin(ImportExportModelAdmin):
             # Botón de Confirmar Compra
             return format_html(
                 '''
-                <a class="btn btn-secondary" href="#" onclick="showCustomConfirm('{}')">Confirmar 🆗</a>
+                <a class="btn btn-dark" href="#" onclick="showCustomConfirm('{}')">Confirmar 🆗</a>
                 <div id="custom-confirm" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
@@ -173,13 +173,13 @@ class CompraAdmin(ImportExportModelAdmin):
 
         elif obj.en_transito:  # Si la compra está en tránsito
             return format_html(
-                '<a class="btn btn-secondary" href="{}">Llegada 🚚</a>',
+                '<a class="btn btn-dark" href="{}">Llegada 🚚</a>',
                 reverse('iniciar_descarga', args=[obj.id])
             )
 
         elif obj.en_descarga:  # Si está en proceso de descarga
             return format_html(
-                '<a class="btn btn-secondary" href="{}">Finalizar Descarga ✅</a>',
+                '<a class="btn btn-dark" href="{}">Finalizar Descarga ✅</a>',
                 reverse('terminar_descarga', args=[obj.id])
             )
 

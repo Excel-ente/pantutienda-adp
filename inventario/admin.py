@@ -95,11 +95,11 @@ class PresentacionAdmin(ImportExportModelAdmin):
 class ProductoPrecioInline(admin.StackedInline):
     model = ProductoPrecio
     extra = 0
-    readonly_fields = ('Costo_unitario', 'Precio_unitario', 'Precio_total', 'Rentabilidad')
+    readonly_fields = ('Costo_unitario', 'Precio_unitario','Rentabilidad')
 
     def get_fields(self, request, obj=None):
         """Determina los campos que se muestran en el inline, basados en la configuración."""
-        fields = ['lista', 'presentacion', 'cantidad', 'unidad_de_medida', 'precio_manual', 'rentabilidad', 'Costo_unitario', 'Precio_unitario', 'Precio_total']
+        fields = ['lista', 'presentacion', 'cantidad', 'unidad_de_medida', 'precio_manual', 'rentabilidad', 'Costo_unitario', 'Precio_unitario',]
 
         config = configuracion.objects.first()
         if config:
@@ -122,11 +122,8 @@ class ProductoPrecioInline(admin.StackedInline):
 
     def Precio_unitario(self, obj):
         moneda = configuracion.objects.first().Moneda
-        return f"{moneda.signo} {obj.precio_unitario_calculado():,.2f} x 1 {obj.unidad_de_medida}"
+        return f"{moneda.signo} {obj.precio_unitario_calculado():,.2f} x 1 {obj.presentacion}"
 
-    def Precio_total(self, obj):
-        moneda = configuracion.objects.first().Moneda
-        return f"{moneda.signo} {obj.precio_total:,.2f} x {obj.cantidad} {obj.unidad_de_medida}"
 
 # Vista para ver los movimientos del producto en el modelo de producto
 class MovimientoProductoInline(admin.TabularInline):
@@ -224,9 +221,9 @@ class StockFilter(SimpleListFilter):
 @admin.register(Producto)
 class ProductoAdmin(ImportExportModelAdmin):
     resource_class = ProductoResource
-    list_display = ('codigo','nombre','costo_ultimo_unitario','precio','en_inventario','publicado')
-    list_display_links = ('codigo','nombre','costo_ultimo_unitario','precio','en_inventario')
-    readonly_fields = ['proveedor','costo_ultimo_unitario','precio','stock_actual','deshabilitar']
+    list_display = ('mostrar_imagen','codigo','nombre','costo_ultimo_unitario','precio','en_inventario','publicado')
+    list_display_links = ('mostrar_imagen','codigo','nombre','costo_ultimo_unitario','precio','en_inventario')
+    readonly_fields = ['mostrar_imagen_form','proveedor','costo_ultimo_unitario','precio','stock_actual','deshabilitar',]
     list_filter = ('categoria','proveedor','habilitar_venta',StockFilter)
     list_per_page = 15
     search_fields = ('codigo','nombre')
@@ -234,6 +231,18 @@ class ProductoAdmin(ImportExportModelAdmin):
     actions = [habilitar_productos_masivamente,deshabilitar_productos_masivamente]
     inlines = [ProductoPrecioInline,MovimientoProductoInline]
 
+    def mostrar_imagen_form(self, obj):
+        if obj.imagen:
+            return format_html('<img src="{}" width="200" height="200" style="border-radius:5px;"/>', obj.imagen.url)
+        return "Sin imagen"
+    mostrar_imagen_form.short_description = 'Imagen actual'
+
+    def mostrar_imagen(self, obj):
+        if obj.imagen:
+            return format_html('<img src="{}" width="50" height="50" style="border-radius:5px;"/>', obj.imagen.url)
+        return "Sin imagen"
+    mostrar_imagen.short_description = "Imagen"
+    
     def deshabilitar(self, obj):
         if obj.id is None:
             return "Producto no guardado"
@@ -256,15 +265,16 @@ class ProductoAdmin(ImportExportModelAdmin):
             return format_html('<a class="btn btn-primary" style="border-radius:5px" href="{}">Publicar</a>', url)
         
      # Sobrescribe el método get_list_display para modificar dinámicamente las columnas
+    
     def get_list_display(self, request):
         # Verifica la configuración
         config = configuracion.objects.first()
         if config and config.valuar_stock_negativo:
             # Si la configuración valuar_stock_negativo es True, mostramos 'codigo'
-            return ('codigo', 'nombre', 'costo_ultimo_unitario', 'precio', 'en_inventario', 'publicado')
+            return ('mostrar_imagen','codigo', 'nombre', 'costo_ultimo_unitario', 'precio', 'en_inventario', 'publicado')
         else:
             # Si no, ocultamos 'codigo'
-            return ('nombre', 'costo_ultimo_unitario', 'precio', 'en_inventario', 'publicado')
+            return ('mostrar_imagen','nombre', 'costo_ultimo_unitario', 'precio', 'en_inventario', 'publicado')
         
     def en_inventario(self,obj):
         texto=obj.stock_actual_str

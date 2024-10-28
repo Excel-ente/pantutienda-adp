@@ -1,4 +1,6 @@
 from django.contrib import admin
+
+from .reporte_pedido import exportar_a_excel, exportar_a_pdf
 from .models import Pedido, ItemPedido
 from django.db.models import F, Sum
 from django.http import HttpResponseRedirect
@@ -40,6 +42,7 @@ class PedidoAdmin(admin.ModelAdmin):
     exclude = ('cliente',)
     list_per_page = 20  # Paginación
     inlines = [ItemPedidoInline]
+    actions = [exportar_a_excel, exportar_a_pdf]
 
     def numero_pedido(self,obj):
         return f'{obj.pk}'
@@ -55,73 +58,82 @@ class PedidoAdmin(admin.ModelAdmin):
         return qs.exclude(estado='abierto')
         
     def changelist_view(self, request, extra_context=None):
-        # Obtener el ChangeList, que es responsable de aplicar los filtros y búsquedas
         response = super().changelist_view(request, extra_context=extra_context)
 
-        # Verificar si la respuesta es un HttpResponseRedirect
-        if isinstance(response, HttpResponseRedirect):
-            return response
-        try:
-            # Obtener el queryset filtrado del ChangeList
-            cl = response.context_data['cl']
-            queryset = cl.queryset
-        except (KeyError, AttributeError):
-            # Si hay un error al obtener el ChangeList, usar el queryset sin filtrar
-            queryset = self.get_queryset(request)
+        # Verificar que la respuesta no sea HttpResponseRedirect
+        if hasattr(response, 'context_data'):
+            try:
+                # Obtener el ChangeList, que es responsable de aplicar los filtros y búsquedas
+                cl = response.context_data['cl']
+                queryset = cl.queryset
+            except (KeyError, AttributeError):
+                # Si hay un error al obtener el ChangeList, usar el queryset sin filtrar
+                queryset = self.get_queryset(request)
+            
+            # Calcular las métricas
+            total_pedidos = queryset.exclude(estado='abierto').count()
+            pedidos_pendientes = queryset.filter(estado='pendiente').count()
+            pedidos_procesando = queryset.filter(estado='en_preparacion').count()
+            pedidos_listo = queryset.filter(estado='listo').count()
+            pedidos_en_camino = queryset.filter(estado='en_camino').count()
+            pedidos_completados = queryset.filter(estado='completado').count()
+            pedidos_cancelados = queryset.filter(estado='cancelado').count()
 
-        # Métricas calculadas
-        total_pedidos = queryset.exclude(estado='abierto').count()
-        pedidos_pendientes = queryset.filter(estado='pendiente').count()
-        pedidos_procesando = queryset.filter(estado='en_preparacion').count()
-        pedidos_listo = queryset.filter(estado='listo').count()
-        pedidos_en_camino = queryset.filter(estado='en_camino').count()
-        pedidos_completados = queryset.filter(estado='completado').count()
-        pedidos_cancelados = queryset.filter(estado='cancelado').count()
+            # Calcular ingresos totales por estado
+            total_importe = queryset.exclude(estado='abierto').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
+            importe_pendientes = queryset.filter(estado='pendiente').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
+            importe_en_preparacion = queryset.filter(estado='en_preparacion').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
+            importe_listo = queryset.filter(estado='listo').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
+            importe_en_camino = queryset.filter(estado='en_camino').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
+            importe_completados = queryset.filter(estado='completado').aggregate(
+                total=Sum(F('items__precio_unitario') * F('items__cantidad'))
+            )['total'] or 0
 
-        # Calcular ingresos totales por estado
-        total_importe = queryset.exclude(estado='abierto').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
-        importe_pendientes = queryset.filter(estado='pendiente').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
-        importe_en_preparacion = queryset.filter(estado='en_preparacion').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
-        importe_listo = queryset.filter(estado='listo').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
-        importe_en_camino = queryset.filter(estado='en_camino').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
-        importe_completados = queryset.filter(estado='completado').aggregate(total=Sum(F('items__precio_unitario') * F('items__cantidad')))['total'] or 0
+            # Datos para las tarjetas
+            extra_context = extra_context or {}
+            extra_context.update({
+                'cards_doble': True,
+                'emoji_1': '🔴',
+                'etiqueta_1': 'Pendientes',
+                'label_val_etiqueta_1': 'Total:',
+                'val_etiqueta_1': f'{pedidos_pendientes}',
+                'label_sub_val_etiqueta_1': 'Importe:',
+                'sub_val_etiqueta_1': f'$ {importe_pendientes:,.2f}',
 
-        # Datos para las tarjetas
-        extra_context = extra_context or {}
-        extra_context.update({
+                'emoji_2': '💼',
+                'etiqueta_2': 'En Proceso',
+                'label_val_etiqueta_2': 'Total:',
+                'val_etiqueta_2': f'{pedidos_procesando}',
+                'label_sub_val_etiqueta_2': 'Importe:',
+                'sub_val_etiqueta_2': f'$ {importe_en_preparacion:,.2f}',
 
-            'cards_doble': True,  # Usa el diseño para tarjetas dobles si Jazzmin lo permite
+                'emoji_3': '🛻',
+                'etiqueta_3': 'Por Entregar',
+                'label_val_etiqueta_3': f'Terminados: {pedidos_listo}',
+                'val_etiqueta_3': f'$ {importe_listo:,.2f}',
+                'label_sub_val_etiqueta_3': f'En camino:{pedidos_en_camino}',
+                'sub_val_etiqueta_3': f'$ {importe_en_camino:,.2f}',
 
-            'emoji_1':f'🔴',
-            'etiqueta_1': 'Pendientes',
-            'label_val_etiqueta_1' : f'Total:',
-            'val_etiqueta_1': f'{pedidos_pendientes}',
-            'label_sub_val_etiqueta_1' : f'Importe:',
-            'sub_val_etiqueta_1': f'$ {importe_pendientes:,.2f}',
+                'emoji_4': '🚀',
+                'etiqueta_4': 'Pedidos Completados',
+                'label_val_etiqueta_4': 'Total:',
+                'val_etiqueta_4': f'{pedidos_completados}',
+                'label_sub_val_etiqueta_4': 'Importe:',
+                'sub_val_etiqueta_4': f'$ {importe_completados:,.2f}',
+            })
 
-            'emoji_2': f'💼',
-            'etiqueta_2': 'En Proceso',
-            'label_val_etiqueta_2' : f'Total:',
-            'val_etiqueta_2': f'{pedidos_procesando}',
-            'label_sub_val_etiqueta_2' : f'Importe:',
-            'sub_val_etiqueta_2': f'$ {importe_en_preparacion:,.2f}',
+            response.context_data.update(extra_context)
 
-            'emoji_3': f'🛻',
-            'etiqueta_3': 'Por Entregar',
-            'label_val_etiqueta_3' : f'Terminados: {pedidos_listo}',
-            'val_etiqueta_3': f'$ {importe_listo:,.2f}',
-            'label_sub_val_etiqueta_3' : f'En camino:{pedidos_en_camino}',
-            'sub_val_etiqueta_3': f'$ {importe_en_camino:,.2f}',
-
-            'emoji_4': f'🚀',
-            'etiqueta_4': 'Pedidos Completados',
-            'label_val_etiqueta_4' : f'Total:',
-            'val_etiqueta_4': f'{pedidos_completados}',
-            'label_sub_val_etiqueta_4' : f'Importe:',
-            'sub_val_etiqueta_4': f'$ {importe_completados:,.2f}',
-        })
-
-        response.context_data.update(extra_context)
         return response
 
     def has_add_permission(self, request, obj=None):
@@ -132,19 +144,19 @@ class PedidoAdmin(admin.ModelAdmin):
 
         if obj.estado == 'pendiente': 
             return format_html(
-                '<a class="btn btn-primary" style="border-radius:5px" href="{}">Confirmar</a>', reverse('confirmar-pedido', args=[obj.id]))
+                '<a class="btn btn-dark" style="border-radius:5px" href="{}">Confirmar</a>', reverse('confirmar-pedido', args=[obj.id]))
         
         elif obj.estado == 'en_preparacion':
             return format_html(
-                '<a class="btn btn-primary" style="border-radius:5px" href="{}">Terminar Armado</a>', reverse('confirmar-armado-pedido', args=[obj.id]))
+                '<a class="btn btn-dark" style="border-radius:5px" href="{}">Terminar Armado</a>', reverse('confirmar-armado-pedido', args=[obj.id]))
         
         elif obj.estado == 'listo':
             return format_html(
-                '<a class="btn btn-primary" style="border-radius:5px" href="{}">Iniciar Envio</a>', reverse('iniciar-entrega-pedido', args=[obj.id]))
+                '<a class="btn btn-dark" style="border-radius:5px" href="{}">Iniciar Envio</a>', reverse('iniciar-entrega-pedido', args=[obj.id]))
         
         elif obj.estado == 'en_camino':
             return format_html(
-                '<a class="btn btn-primary" style="border-radius:5px" href="{}">Finalizar Envio</a>', reverse('finalizar-entrega-pedido', args=[obj.id]))
+                '<a class="btn btn-dark" style="border-radius:5px" href="{}">Finalizar Envio</a>', reverse('finalizar-entrega-pedido', args=[obj.id]))
         
 
 

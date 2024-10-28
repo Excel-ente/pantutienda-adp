@@ -73,16 +73,18 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=100,blank=False,null=False)
     descripcion = models.CharField(max_length=200,blank=True,null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    cantidad = models.DecimalField(max_digits=20, decimal_places=2, default=1, blank=False, null=False)
+    unidad_de_medida = models.CharField(max_length=50,choices=UNIDADES_DE_MEDIDA,blank=False,null=False,default="Unidades")
+    costo_unitario = models.DecimalField(max_digits=20, decimal_places=2, default=0, blank=False, null=False)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.SET_NULL, null=True, blank=True,verbose_name='Proveedor Ult. Compra')
+
     imagen = models.ImageField(
+        max_length=255,
         upload_to='img/',
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif']), validate_image_size]
     )
-    cantidad = models.DecimalField(max_digits=20, decimal_places=2, default=1, blank=False, null=False)
-    unidad_de_medida = models.CharField(max_length=50,choices=UNIDADES_DE_MEDIDA,blank=False,null=False,default="Unidades")
-    costo_unitario = models.DecimalField(max_digits=20, decimal_places=2, default=0, blank=False, null=False)
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.SET_NULL, null=True, blank=True,verbose_name='Proveedor Ult. Compra')
 
     habilitar_venta = models.BooleanField(default=False)
     ultima_modificacion = models.DateTimeField(auto_now_add=True,blank=True,null=True)

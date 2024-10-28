@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -90,10 +90,16 @@
             <img src="https://pantutienda.com/static/logo.png" alt="Logo">
         </div>
         <div class="email-body">
-            <h1>¡Tienes un nuevo pedido!</h1>
-            <p>Estimado/a {{ pedido.cliente.usuario.first_name }},</p>
-            <p>Has recibido un nuevo pedido con los siguientes detalles:</p>
+            <h1>¡Recibimos tu pedidido!</h1>
+            <hr>
 
+            <p>Hola {{ pedido.cliente.usuario.first_name }},</p>
+            <p>Hemos recibido un nuevo pedido correctamente!</p>
+            <p>Entregaremos en la siguiente dirección: </p><b>{{ pedido.direccion_entrega_cliente }}</b></p>
+
+            <hr>
+            
+            <p>A continuación te detallamos los productos solicitados:</p>
             <!-- Tabla de productos -->
             <table>
                 <thead>
@@ -107,24 +113,35 @@
                     {% for item in items %}
                     <tr>
                         <td>{{ item.producto.nombre }}</td>
-                        <td>{{ item.cantidad }}</td>
-                        <td>{{ item.subtotal }}</td>
+                        <td>{{ item.cantidad|floatformat:2|intcomma }}</td>
+                        <td>{{ item.subtotal|floatformat:2|intcomma }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
 
-            <p>Total del pedido: <strong>{{ total }}</strong></p>
+            <p>Total del pedido: $ <strong>{{ total|floatformat:2|intcomma }}</strong></p>
 
-            <p>
-                También puedes ingresar al panel y ver los detalles completos del pedido:
-                <br>
-                <a href="https://pantutienda.com/app/" target="_blank" class="btn-ingresar" style="color: white;">Ver Pedido</a>
-            </p>
+
         </div>
         <div class="divider"></div>
         <div class="card-footer">
-            <p>¡Saludos!<br>El equipo de PantuTienda.com</p>
+           
+            <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <p>¿Necesitas ayuda?</p>
+                    <a href="https://wa.me/1157045506?text=¡Hola!"
+                       style="background-color:#25D366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; display:inline-block;"
+                       target="_blank">
+                      📲 Escríbenos por WhatsApp
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+
+              <p>¡Saludos!<br>El equipo de <a href="https://pantutienda.com"></a>PantuTienda.com</p>
         </div>
     </div>
 </body>

@@ -136,3 +136,262 @@ Traceback (most recent call last):
   File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
     raise DisallowedHost(msg)
 django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'www.shadowserver.org'. You may need to add 'www.shadowserver.org' to ALLOWED_HOSTS.
+ERROR 2024-10-28 00:57:50,828 log Internal Server Error: /front/productos/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 222, in productos
+    'precio_unitario': float(pp.precio_unitario_calculado()),
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/inventario/models.py", line 242, in precio_unitario_calculado
+    config = configuracion.objects.first()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1095, in first
+    for obj in queryset[:1]:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 398, in __iter__
+    self._fetch_all()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+ERROR 2024-10-28 00:57:56,335 log Internal Server Error: /front/productos/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 222, in productos
+    'precio_unitario': float(pp.precio_unitario_calculado()),
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/inventario/models.py", line 242, in precio_unitario_calculado
+    config = configuracion.objects.first()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1095, in first
+    for obj in queryset[:1]:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 398, in __iter__
+    self._fetch_all()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+ERROR 2024-10-28 00:58:01,171 log Internal Server Error: /front/productos/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+sqlite3.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 222, in productos
+    'precio_unitario': float(pp.precio_unitario_calculado()),
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/inventario/models.py", line 242, in precio_unitario_calculado
+    config = configuracion.objects.first()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1095, in first
+    for obj in queryset[:1]:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 398, in __iter__
+    self._fetch_all()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 1926, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+django.db.utils.OperationalError: no such column: configuracion_configuracion.mail_pedido_confirmado
+ERROR 2024-10-28 01:02:02,068 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 334, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 94, in send_mail_nuevo_pedido
+    service = build('gmail', 'v1', credentials=creds)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 315, in build
+    service = build_from_document(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 616, in build_from_document
+    credentials = _auth.default_credentials(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_auth.py", line 57, in default_credentials
+    credentials, _ = google.auth.default(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/google/auth/_default.py", line 693, in default
+    raise exceptions.DefaultCredentialsError(_CLOUD_SDK_MISSING_CREDENTIALS)
+google.auth.exceptions.DefaultCredentialsError: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+ERROR 2024-10-28 01:04:28,052 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 334, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 94, in send_mail_nuevo_pedido
+    service = build('gmail', 'v1', credentials=creds)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 315, in build
+    service = build_from_document(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 616, in build_from_document
+    credentials = _auth.default_credentials(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_auth.py", line 57, in default_credentials
+    credentials, _ = google.auth.default(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/google/auth/_default.py", line 693, in default
+    raise exceptions.DefaultCredentialsError(_CLOUD_SDK_MISSING_CREDENTIALS)
+google.auth.exceptions.DefaultCredentialsError: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+ERROR 2024-10-28 09:00:08,251 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 334, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 94, in send_mail_nuevo_pedido
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 315, in build
+    service = build_from_document(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_helpers.py", line 130, in positional_wrapper
+    return wrapped(*args, **kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/discovery.py", line 616, in build_from_document
+    credentials = _auth.default_credentials(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/googleapiclient/_auth.py", line 57, in default_credentials
+    credentials, _ = google.auth.default(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/google/auth/_default.py", line 693, in default
+    raise exceptions.DefaultCredentialsError(_CLOUD_SDK_MISSING_CREDENTIALS)
+google.auth.exceptions.DefaultCredentialsError: Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+ERROR 2024-10-28 09:06:25,548 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 334, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 109, in send_mail_nuevo_pedido
+    creds = get_credentials()
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 44, in get_credentials
+    with open(token_json, 'w') as token:
+PermissionError: [Errno 13] Permission denied: 'token.json'

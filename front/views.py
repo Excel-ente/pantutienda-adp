@@ -14,6 +14,9 @@ from django.core.cache import cache
 from configuracion.models import configuracion
 from django.utils.safestring import mark_safe
 import json
+from datetime import timedelta
+from django.utils import timezone
+from monitoreo.models import FailedLoginAttempt
 # ------------------------------------------------------------------------------------------
 # Funciones
 def obtener_perfil(user):
@@ -336,11 +339,26 @@ def confirmar_pedido(request):
         return JsonResponse({'success': True})
 
 
+
+
+def is_ip_blocked(ip):
+    block_duration = timedelta(minutes=10)  # Tiempo de bloqueo
+    cutoff_time = timezone.now() - block_duration
+    attempts = FailedLoginAttempt.objects.filter(ip_address=ip, attempt_time__gte=cutoff_time).count()
+    return attempts >= 5  # Número máximo de intentos fallidos antes del bloqueo
+
+
 # ------------------------------------------------------------------------------------------
 def custom_login(request):
-    
-    if request.method == 'POST':
+    ip = request.META.get('REMOTE_ADDR')  # Obtener la IP del usuario
 
+    # Verificar si la IP está bloqueada
+    if is_ip_blocked(ip):
+        messages.error(request, 'Demasiados intentos fallidos. Inténtelo de nuevo en 10 minutos.')
+        return render(request, 'login.html')
+
+    # Intento de autenticación
+    if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
@@ -348,10 +366,11 @@ def custom_login(request):
         if user is not None:
             login(request, user)
             messages.success(request, '¡Bienvenido!')
-            return redirect('home')  # Redirigir al home
+            return redirect('home')  # Redirigir al home después del inicio exitoso
         else:
+            # Registrar el intento fallido
+            FailedLoginAttempt.objects.create(ip_address=ip)
             messages.error(request, 'Usuario o contraseña incorrectos.')
-            return redirect('login')  # Redirigir de nuevo a login en caso de error
 
     return render(request, 'login.html')
     

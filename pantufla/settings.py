@@ -25,10 +25,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    #'whitenoise.runserver_nostatic', # agregue aca
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'import_export',
+    'monitoreo',
     'front',
     'mensajeria',
     'configuracion',

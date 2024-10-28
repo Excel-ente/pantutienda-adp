@@ -22,10 +22,12 @@ TEMPLATE_PATH_CLIENTE = os.path.join(os.path.dirname(__file__), 'mails/mail_alta
 
 def get_credentials():
     creds = None
-    token_json = 'token.json'
+
+    token_json = env("GOOGLE_TOKEN", default=None)
+    #token_json = 'token.json'
     
     # Leer credenciales desde el archivo token.json si existe
-    if os.path.exists(token_json):
+    if token_json:
         creds = Credentials.from_authorized_user_file(token_json, SCOPES)
     
     # Si no existen credenciales o son inválidas, intenta refrescarlas

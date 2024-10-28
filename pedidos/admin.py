@@ -37,7 +37,7 @@ class PedidoAdmin(admin.ModelAdmin):
     list_display = ('numero_pedido', 'direccion_entrega_cliente','importe', 'estado','ACCIONES')
     list_filter = ('id','cliente', 'estado')  # Filtros por cliente y estado
     search_fields = ('cliente__usuario__username',)  # Búsqueda por nombre de usuario del cliente
-    readonly_fields =('numero_pedido','direccion_entrega_cliente','estado')
+    readonly_fields =('numero_pedido','cliente','direccion_entrega_cliente','estado')
     date_hierarchy = 'creado_en'  # Jerarquía por fecha
     exclude = ('cliente',)
     list_per_page = 20  # Paginación

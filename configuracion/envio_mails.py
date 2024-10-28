@@ -8,7 +8,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from django.template.loader import render_to_string
 import environ
-import json
 
 # Inicializa django-environ para leer el archivo .env
 env = environ.Env()
@@ -21,22 +20,33 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 TEMPLATE_PATH_PROVEEDOR = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_proveedor.html')
 TEMPLATE_PATH_CLIENTE = os.path.join(os.path.dirname(__file__), 'mails/mail_alta_cliente.html')
 
-
 def get_credentials():
     creds = None
-    token_json = os.getenv("GOOGLE_TOKEN")  # Cargar el token desde la variable de entorno
-
+    token_json = os.getenv("GOOGLE_TOKEN")
+    #token_json = 'token.json'
+    
+    # Leer credenciales desde el archivo token.json si existe
     if token_json:
-        try:
-            creds = Credentials.from_authorized_user_info(json.loads(token_json), SCOPES)
-        except Exception as e:
-            print(f"Error al cargar las credenciales: {e}")
-            return None
-
-    # Si las credenciales existen pero están vencidas, intenta refrescarlas
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-
+        creds = Credentials.from_authorized_user_file(token_json, SCOPES)
+    
+    # Si no existen credenciales o son inválidas, intenta refrescarlas
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            # Usa las variables de entorno para crear las credenciales
+            creds = Credentials(
+                None,
+                refresh_token=env('GOOGLE_OAUTH2_REFRESH_TOKEN'),
+                token_uri='https://oauth2.googleapis.com/token',
+                client_id=env('GOOGLE_OAUTH2_CLIENT_ID'),
+                client_secret=env('GOOGLE_OAUTH2_CLIENT_SECRET')
+            )
+            creds.refresh(Request())
+        # Guardar el nuevo token en token.json
+        with open(token_json, 'w') as token:
+            token.write(creds.to_json())
+    
     return creds
 
 def send_mail_alta_proveedor(proveedor, email):
@@ -126,6 +136,8 @@ def send_mail_nuevo_pedido(pedido):
     
     except HttpError as error:
         print(f'Error al enviar email al usuario: {error}')
+
+
 
 def send_mail_pedido_confirmado(pedido):
     try:

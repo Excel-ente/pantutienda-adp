@@ -52,6 +52,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Este es mi middelware custom
+    'configuracion.middleware.security_middleware.BruteForceProtectionMiddleware',
+
 ]
 
 ROOT_URLCONF = 'pantufla.urls'

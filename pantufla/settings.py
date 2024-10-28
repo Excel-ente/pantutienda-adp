@@ -52,10 +52,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # Este es mi middelware custom
-    'configuracion.middleware.security_middleware.BruteForceProtectionMiddleware',
-
 ]
 
 ROOT_URLCONF = 'pantufla.urls'
@@ -124,10 +120,6 @@ LOGGING = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
-AUTHENTICATION_LOCKOUT_THRESHOLD = 3 #INTENTOS FALLIDOS PARA BLOQUEAR CUENTA
-
-AUTHENTICATION_LOCKOUT_DURATION = 15 #TIEMPO DE BLOQUEO DE CUENTA
 
 AUTH_PASSWORD_MIN_LENGTH = 8
 

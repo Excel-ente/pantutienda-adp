@@ -25,6 +25,10 @@ def generar_movimiento_compra(compra):
             salida=0,  # No hay salida porque es una compra (solo entrada)
             estado=False  # Marcamos el movimiento como confirmado
         )
+        
+        producto_comprado = Producto.objects.get(id=detalle.producto.pk)
+        producto_comprado.proveedor = detalle.compra.proveedor
+        producto_comprado.save()
 
         if (actualizar_autom == False) or (actualizar_autom == True and detalle.ActualizarCosto):
             # Actualizar costo
@@ -33,6 +37,7 @@ def generar_movimiento_compra(compra):
             item.save()
 
 
+    
 
 
     return f'Movimientos generados para la compra {compra.id}'

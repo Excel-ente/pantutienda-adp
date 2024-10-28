@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-from front.views import custom_logout,custom_login
+from front.views import custom_logout
 from django.conf import settings
 from django.conf.urls.static import static
 

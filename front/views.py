@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from front.models import Landing
 from inventario.models import Producto,ProductoPrecio
+from monitoreo.views import obtener_info_ip
 from pedidos.models import Pedido
 from agenda.models import Cliente,Proveedor,Chofer,Vendedor,DireccionEntregaCliente
 from django.contrib.auth.decorators import login_required
@@ -342,22 +343,17 @@ def confirmar_pedido(request):
 
 
 def is_ip_blocked(ip):
-    block_duration = timedelta(minutes=10)  # Tiempo de bloqueo
+    block_duration = timedelta(minutes=10)
     cutoff_time = timezone.now() - block_duration
     attempts = FailedLoginAttempt.objects.filter(ip_address=ip, attempt_time__gte=cutoff_time).count()
-    return attempts >= 5  # Número máximo de intentos fallidos antes del bloqueo
-
+    return attempts >= 10
 
 # ------------------------------------------------------------------------------------------
 def custom_login(request):
-    ip_address = request.META.get('REMOTE_ADDR')
-    user_agent = request.META.get('HTTP_USER_AGENT', '')
-    request_method = request.method
-    referer = request.META.get('HTTP_REFERER', '')
-    request_path = request.path
+    ip = request.META.get('REMOTE_ADDR')
 
-    # Verificar si la IP está bloqueada antes de continuar
-    if is_ip_blocked(ip_address):
+    # Verifica si la IP está bloqueada
+    if is_ip_blocked(ip):
         messages.error(request, 'Demasiados intentos fallidos. Inténtelo de nuevo en 10 minutos.')
         return render(request, 'login.html')
 
@@ -371,16 +367,20 @@ def custom_login(request):
             messages.success(request, '¡Bienvenido!')
             return redirect('home')
         else:
-            # Crear el registro de intento fallido
+            # Llama a la función para obtener la información de la IP
+            info_ip = obtener_info_ip(ip)
+            
+            # Registra el intento fallido con los datos adicionales
             FailedLoginAttempt.objects.create(
-                ip_address=ip_address,
-                user_agent=user_agent,
-                request_method=request_method,
-                referer=referer,
-                request_path=request_path
+                ip_address=ip,
+                ciudad=info_ip['ciudad'],
+                region=info_ip['region'],
+                pais=info_ip['pais'],
+                organizacion=info_ip['organizacion']
             )
-            messages.error(request, 'Usuario o contraseña incorrectos.')
 
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+    
     return render(request, 'login.html')
     
 def registro(request):

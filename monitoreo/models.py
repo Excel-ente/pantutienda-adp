@@ -1,25 +1,20 @@
 from django.db import models
 from django.utils import timezone
 
+from django.db import models
+from django.utils import timezone
+
 class FailedLoginAttempt(models.Model):
     ip_address = models.GenericIPAddressField()
     attempt_time = models.DateTimeField(default=timezone.now)
-    user_agent = models.TextField(blank=True, null=True)
-    device_type = models.CharField(max_length=50, blank=True, null=True)
-    request_method = models.CharField(max_length=10, blank=True, null=True)
-    referer = models.CharField(max_length=255, blank=True, null=True)
-    request_path = models.CharField(max_length=255, blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        # Detectar el tipo de dispositivo de manera básica
-        if 'Mobile' in self.user_agent:
-            self.device_type = 'Mobile'
-        elif 'Tablet' in self.user_agent:
-            self.device_type = 'Tablet'
-        else:
-            self.device_type = 'Desktop'
-
-        super().save(*args, **kwargs)
+    ciudad = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    pais = models.CharField(max_length=100, blank=True, null=True)
+    organizacion = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.ip_address} - {self.attempt_time}"
+        return f"Intento fallido desde {self.ip_address} en {self.attempt_time}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+

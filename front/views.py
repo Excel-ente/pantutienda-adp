@@ -350,14 +350,17 @@ def is_ip_blocked(ip):
 
 # ------------------------------------------------------------------------------------------
 def custom_login(request):
-    ip = request.META.get('REMOTE_ADDR')  # Obtener la IP del usuario
+    ip_address = request.META.get('REMOTE_ADDR')
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    request_method = request.method
+    referer = request.META.get('HTTP_REFERER', '')
+    request_path = request.path
 
-    # Verificar si la IP está bloqueada
-    if is_ip_blocked(ip):
+    # Verificar si la IP está bloqueada antes de continuar
+    if is_ip_blocked(ip_address):
         messages.error(request, 'Demasiados intentos fallidos. Inténtelo de nuevo en 10 minutos.')
         return render(request, 'login.html')
 
-    # Intento de autenticación
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -366,10 +369,16 @@ def custom_login(request):
         if user is not None:
             login(request, user)
             messages.success(request, '¡Bienvenido!')
-            return redirect('home')  # Redirigir al home después del inicio exitoso
+            return redirect('home')
         else:
-            # Registrar el intento fallido
-            FailedLoginAttempt.objects.create(ip_address=ip)
+            # Crear el registro de intento fallido
+            FailedLoginAttempt.objects.create(
+                ip_address=ip_address,
+                user_agent=user_agent,
+                request_method=request_method,
+                referer=referer,
+                request_path=request_path
+            )
             messages.error(request, 'Usuario o contraseña incorrectos.')
 
     return render(request, 'login.html')

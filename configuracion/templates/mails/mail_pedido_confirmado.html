@@ -1,0 +1,146 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            /* Sombras más intensas y notables */
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            background-color: #f8f2ed;
+            border-color: #9c8b7c;
+        }
+        .card img {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .card h1 {
+            font-size: 32px;
+            color: #503d2c;
+            margin-bottom: 20px;
+        }
+        .card p {
+            font-size: 16px;
+            color: #251f19;
+        }
+        .card .divider {
+            margin: 20px 0;
+            border-top: 1px solid #ddd;
+        }
+        .card-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #786550;
+        }
+        .card-footer p{
+            color: #786550;
+        }
+
+        /* Estilos de la tabla */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+            color: #503d2c;
+        }
+        td {
+            text-align: center;
+        }
+        /* Estilos del botón */
+        .btn-ingresar {
+            background-color: #b58b00; /* Color dorado */
+            color: white; /* Texto blanco */
+            padding: 10px 20px; /* Espaciado interno */
+            text-decoration: none; /* Quitar subrayado */
+            border-radius: 8px; /* Bordes redondeados */
+            font-size: 16px; /* Tamaño de fuente */
+            display: inline-block; /* Comportamiento de botón */
+            border: none; /* Sin bordes externos */
+            text-align: center; /* Alinear texto */
+            font-weight: bold; /* Texto en negrita */
+            transition: background-color 0.3s ease; /* Transición para el hover */
+            margin-top: 15px;
+        }
+
+        /* Hover del botón */
+        .btn-ingresar:hover {
+            color: white; /* Texto blanco */
+            background-color: #8e6e00; /* Color dorado más oscuro */
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="email-header">
+            <img src="https://pantutienda.com/static/logo.png" alt="Logo">
+        </div>
+        <div class="email-body">
+            <h1>¡Confirmamos tu Pedido!</h1>
+            <hr>
+
+            <p>Hola {{ pedido.cliente.usuario.first_name }},</p>
+            <p>Hemos confirmado tu pedido y ya estamos preparandolo.</p>
+            <p>Te recordamos que el pedido se entregará en la siguiente dirección: </p><b>{{ pedido.direccion_entrega_cliente }}</b></p>
+            
+            <hr>
+            <p>A continuación te detallamos los productos que te enviaremos:</p>
+   
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.producto.nombre }}</td>
+                        <td>{{ item.cantidad|floatformat:2|intcomma }}</td>
+                        <td>{{ item.subtotal|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p>Total del pedido: $ <strong>{{ total|floatformat:2|intcomma }}</strong></p>
+
+        </div>
+        <div class="divider"></div>
+        <div class="card-footer">
+           
+            <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <p>¿Necesitas ayuda?</p>
+                    <a href="https://wa.me/1157045506?text=¡Hola!"
+                       style="background-color:#25D366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; display:inline-block;"
+                       target="_blank">
+                      📲 Escríbenos por WhatsApp
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+
+            <p>¡Saludos!<br>El equipo de <a href="https://pantutienda.com"></a>PantuTienda.com</p>
+        </div>
+    </div>
+</body>
+</html>

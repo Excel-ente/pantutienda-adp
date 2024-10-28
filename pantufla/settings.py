@@ -118,10 +118,14 @@ LOGGING = {
     },
 }
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTHENTICATION_LOCKUOUT_THRESHOLD = 8 #INTENTOS FALLIDOS PARA BLOQUEAR CUENTA
+
+AUTHENTICATION_LOCKUOUT_DURATION = 60 #TIEMPO DE BLOQUEO DE CUENTA
+
+AUTH_PASSWORD_MIN_LENGTH = 8
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -129,6 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8,},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',

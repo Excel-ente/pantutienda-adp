@@ -130,8 +130,6 @@ class configuracion(models.Model):
     mail_bienvenida_proveedor = models.BooleanField(default=False)
     gestionar_armar_pedido = models.BooleanField(default=False,help_text='Si desea gestionar el armado de los pedidos, dejar esta casilla en True.')
     gestionar_entrega = models.BooleanField(default=False,help_text='Si desea gestionar la entrega de los pedidos de clientes (Fletes, Entregas), dejar esta casilla en True.')
-    confirmacion_pedido_via_mail = models.BooleanField(default=False,help_text='Si desea enviar un mail al cliente cuando el pedido sea confirmado, dejar esta casilla en True.')
-    #mail_pedido_confirmado = models.BooleanField(default=False,help_text='Si dmado, dejar esta casilla en True.')
 
 
     class Meta:

@@ -234,14 +234,15 @@ JAZZMIN_SETTINGS = {
     ],
 
 
-        
     "topmenu_links": [
         {"app": "configuracion", "collapsible": True, "icon": "fas fa-app"},
         {"app": "agenda", "collapsible": True, "icon": "fas fa-app"},
         {"app": "compras", "collapsible": True, "icon": "fas fa-app"},
         {"app": "contabilidad", "collapsible": True, "icon": "fas fa-app"},
         {"app": "inventario", "collapsible": True, "icon": "fas fa-app"},
-        {"app": "front", "collapsible": True, "icon": "fas fa-app"},                
+        {"app": "front", "collapsible": True, "icon": "fas fa-app"},   
+        {"app": "monitoreo", "collapsible": True, "icon": "fas fa-app"},  
+                     
     ],
     
     #############
@@ -265,6 +266,7 @@ JAZZMIN_SETTINGS = {
         'reportes',
         'mensajeria',
         'front',
+        'monitoreo'
         ],
 
     # Hide these models when generating side menu (e.g auth.user)

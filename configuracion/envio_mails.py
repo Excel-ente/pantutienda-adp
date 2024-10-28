@@ -19,15 +19,31 @@ TEMPLATE_PATH_CLIENTE = os.path.join(os.path.dirname(__file__), 'mails/mail_alta
 
 def get_credentials():
     creds = None
-    token_json = os.getenv("GOOGLE_TOKEN")  # Cargar el token desde la variable de entorno
+    token_json = 'token.json'
+    
+    # Intentar cargar credenciales desde token.json
+    if os.path.exists(token_json):
+        creds = Credentials.from_authorized_user_file(token_json, SCOPES)
+    
+    # Si no existen credenciales o son inválidas, intenta refrescarlas o generarlas
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            # Usa las variables de entorno para crear las credenciales
+            creds = Credentials(
+                None,
+                refresh_token=os.getenv('GOOGLE_OAUTH2_REFRESH_TOKEN'),
+                token_uri='https://oauth2.googleapis.com/token',
+                client_id=os.getenv('GOOGLE_OAUTH2_CLIENT_ID'),
+                client_secret=os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET')
+            )
+            creds.refresh(Request())  # Refresca el token
 
-    if token_json:
-        creds = Credentials.from_authorized_user_info(json.loads(token_json), SCOPES)
-
-    # Si las credenciales existen pero están vencidas, intenta refrescarlas
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-
+        # Guardar el nuevo token en token.json
+        with open(token_json, 'w') as token:
+            token.write(creds.to_json())
+    
     return creds
 
 def send_mail_alta_proveedor(proveedor, email):
@@ -117,8 +133,6 @@ def send_mail_nuevo_pedido(pedido):
     
     except HttpError as error:
         print(f'Error al enviar email al usuario: {error}')
-
-
 
 def send_mail_pedido_confirmado(pedido):
     try:

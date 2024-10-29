@@ -3217,3 +3217,53 @@ Traceback (most recent call last):
                                               ^^^^^^^^^^^^
 AttributeError: 'str' object has no attribute 'pk'
 ERROR 2024-10-28 23:54:45,204 basehttp "POST /app/pedidos/pedido/ HTTP/1.1" 500 139831
+ERROR 2024-10-29 00:13:49,034 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 338, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 109, in send_mail_nuevo_pedido
+    creds = get_credentials()
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 41, in get_credentials
+    creds.refresh(Request())  # Refresca el token
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/google/oauth2/credentials.py", line 397, in refresh
+    raise exceptions.RefreshError(
+google.auth.exceptions.RefreshError: The credentials do not contain the necessary fields need to refresh the access token. You must specify refresh_token, token_uri, client_id, and client_secret.
+ERROR 2024-10-29 09:02:06,992 log Internal Server Error: /front/confirmar-pedido/
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/front/views.py", line 338, in confirmar_pedido
+    pedido.save()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/db/models/base.py", line 916, in save_base
+    post_save.send(
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/pedidos/signals.py", line 21, in enviar_correo_confirmacion
+    send_mail_nuevo_pedido(instance)
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 109, in send_mail_nuevo_pedido
+    creds = get_credentials()
+  File "/home/ubuntu/aplicaciones/pantutienda-adp/configuracion/envio_mails.py", line 41, in get_credentials
+    creds.refresh(Request())  # Refresca el token
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/google/oauth2/credentials.py", line 397, in refresh
+    raise exceptions.RefreshError(
+google.auth.exceptions.RefreshError: The credentials do not contain the necessary fields need to refresh the access token. You must specify refresh_token, token_uri, client_id, and client_secret.

@@ -72,6 +72,7 @@ class Producto(models.Model):
     codigo = models.CharField(max_length=100,blank=True,null=True)
     nombre = models.CharField(max_length=100,blank=False,null=False)
     descripcion = models.CharField(max_length=200,blank=True,null=True)
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, default='Simple')
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     cantidad = models.DecimalField(max_digits=20, decimal_places=2, default=1, blank=False, null=False)
     unidad_de_medida = models.CharField(max_length=50,choices=UNIDADES_DE_MEDIDA,blank=False,null=False,default="Unidades")
@@ -95,7 +96,12 @@ class Producto(models.Model):
 
     def __str__(self):
         return f'{self.nombre}'
+    
+    def save(self, *args, **kwargs):
+        if self.tipo == 'Compuesto':
+            self.costo_unitario = self.costo_unitario_calculado()
 
+        super().save(*args, **kwargs)
 
     def es_publicable(self):
         if ProductoPrecio.objects.filter(producto=self):
@@ -103,6 +109,16 @@ class Producto(models.Model):
         else:
             return False
 
+    # Función para calcular el costo total si el producto es compuesto
+    def calcular_costo_total(self):
+        if self.tipo == 'Compuesto':
+            # Sumar el costo de los productos en la receta
+            return sum([
+                receta.cantidad * receta.producto_usado.costo_unitario
+                for receta in self.recetas.all()
+            ])
+        return self.costo_unitario
+        
     @property
     def stock_actual(self):
 
@@ -153,6 +169,99 @@ class Producto(models.Model):
             valuacion=0
         return valuacion
     
+    def costo_unitario_calculado(self):
+        
+        if self.tipo == 'Compuesto':
+            # Obtener todos los ingredientes asociados al producto a través de la receta
+            ingredientes = RecetaProducto.objects.filter(producto_principal=self)
+            
+            # Calcular el costo total en base a cada ingrediente y su cantidad
+            costo_total = sum(ingrediente.Costo_calculado() for ingrediente in ingredientes)
+   
+            return costo_total
+        
+        return self.costo_unitario
+# -----------------------------------------------------------------------------
+# Metodos para acceder a los valores de forma dinamica
+# productoprecio.precio_unitario()    ---> Devuelve el precio de venta unitario
+# productoprecio.precio_total()    ---> Devuelve el precio de venta total
+# productoprecio.costo_total()    ---> Devuelve el costo final de venta del producto
+class RecetaProducto(models.Model):
+    producto_principal = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='recetas')
+    producto_usado = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='usado_en_recetas')
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)
+    unidad_de_medida = models.CharField(max_length=50, choices=UNIDADES_DE_MEDIDA)
+
+    def __str__(self):
+        return f'{self.cantidad} {self.unidad_de_medida} de {self.producto_usado.nombre}'
+    
+    class Meta:
+        verbose_name = 'composicion'
+        verbose_name_plural = '🛠️ Composicion'
+
+    def Costo_calculado(self):
+        costo_unitario = float(self.producto_usado.costo_unitario) * float(self.cantidad) or 0
+        if self.unidad_de_medida != self.producto_usado.unidad_de_medida:
+            if self.unidad_de_medida == "Kilos" or self.unidad_de_medida == "Litros":
+                costo_unitario = float(costo_unitario) * 1000
+            elif self.unidad_de_medida == "Gramos" or self.unidad_de_medida == "Mililitros":
+                costo_unitario = float(costo_unitario) / 1000
+            elif self.unidad_de_medida == "Mts":
+                costo_unitario = float(costo_unitario) * 100
+            elif self.unidad_de_medida == "Cms":
+                costo_unitario = float(costo_unitario) / 100 
+            elif self.unidad_de_medida == "Onzas":
+                costo_unitario = float(costo_unitario) / 16
+            elif self.unidad_de_medida == "Libras":
+                costo_unitario = float(costo_unitario) * 16    
+
+        return costo_unitario
+
+    def clean(self): 
+        if self.validad_udm() != True:
+            raise ValidationError(f"Validar Unidad de medida.") 
+        return super().clean()
+    
+    def validad_udm(self):
+        '''
+            Esta validacion es para ver si las unidades de medida corresponden.
+            Solo se usa al guardar un precio de producto
+        '''
+        unidad_compra=self.producto_usado.unidad_de_medida
+        unidad_uso=self.unidad_de_medida
+        if unidad_compra==unidad_uso:
+            return True
+        else: 
+            if unidad_compra == 'Unidades':
+                raise ValidationError(f"El precio tiene que tener la siguiente unidad de medida: Unidades")
+            elif unidad_compra == 'Mt2s':
+                raise ValidationError(f"El precio tiene que tener la siguiente unidad de medida: Mt2s")
+            elif unidad_compra == 'Kilos':
+                if unidad_uso != 'Gramos':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Kilos o Gramos")
+            elif unidad_compra == 'Gramos':
+                if unidad_uso != 'Kilos':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Kilos o Gramos")
+            elif unidad_compra == 'Litros':    
+                if unidad_uso != 'Mililitros':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Litros o Mililitros")
+            elif unidad_compra == 'Mililitros':
+                if unidad_uso != 'Litros':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Litros o Mililitros")
+            elif unidad_compra == 'Onzas':    
+                if unidad_uso != 'Libras':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Libras o Onzas")
+            elif unidad_compra == 'Libras':
+                if unidad_uso != 'Onzas':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Libras o Onzas")
+            elif unidad_compra == 'Mts':    
+                if unidad_uso != 'Cms':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Mts o Cms")
+            elif unidad_compra == 'Cms':
+                if unidad_uso != 'Mts':
+                    raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Mts o Cms")
+            return True
+
 # -----------------------------------------------------------------------------
 # Metodos para acceder a los valores de forma dinamica
 # productoprecio.precio_unitario()    ---> Devuelve el precio de venta unitario
@@ -238,24 +347,31 @@ class ProductoPrecio(models.Model):
                     raise ValidationError(f"El precio tiene que tener una de las siguientes unidades de medida: Mts o Cms")
             return True
 
+    def costo_unit(self):
+        costo= float(self.producto.costo_unitario_calculado())   
+        return costo
+    
     def precio_unitario_calculado(self):
         config = configuracion.objects.first()
         precio_venta = 0
-        costo_unitario = float(self.producto.costo_unitario) * float(self.cantidad) or 0
 
-        if self.unidad_de_medida != self.producto.unidad_de_medida:
-            if self.unidad_de_medida == "Kilos" or self.unidad_de_medida == "Litros":
-                costo_unitario = float(costo_unitario) * 1000
-            elif self.unidad_de_medida == "Gramos" or self.unidad_de_medida == "Mililitros":
-                costo_unitario = float(costo_unitario) / 1000
-            elif self.unidad_de_medida == "Mts":
-                costo_unitario = float(costo_unitario) * 100
-            elif self.unidad_de_medida == "Cms":
-                costo_unitario = float(costo_unitario) / 100 
-            elif self.unidad_de_medida == "Onzas":
-                costo_unitario = float(costo_unitario) / 16
-            elif self.unidad_de_medida == "Libras":
-                costo_unitario = float(costo_unitario) * 16    
+        if self.producto.tipo == 'Simple':
+            costo_unitario = float(self.producto.costo_unitario) or 0
+            if self.unidad_de_medida != self.producto.unidad_de_medida:
+                if self.unidad_de_medida == "Kilos" or self.unidad_de_medida == "Litros":
+                    costo_unitario = float(costo_unitario) * 1000
+                elif self.unidad_de_medida == "Gramos" or self.unidad_de_medida == "Mililitros":
+                    costo_unitario = float(costo_unitario) / 1000
+                elif self.unidad_de_medida == "Mts":
+                    costo_unitario = float(costo_unitario) * 100
+                elif self.unidad_de_medida == "Cms":
+                    costo_unitario = float(costo_unitario) / 100 
+                elif self.unidad_de_medida == "Onzas":
+                    costo_unitario = float(costo_unitario) / 16
+                elif self.unidad_de_medida == "Libras":
+                    costo_unitario = float(costo_unitario) * 16    
+        else:
+            costo_unitario = self.producto.costo_unitario_calculado()
 
         if config.calculo_rentabilidad == 'Sobre costo':
             
@@ -269,12 +385,12 @@ class ProductoPrecio(models.Model):
             # Lógica de cálculo basada en otro método de rentabilidad
 
             precio_venta = float(costo_unitario) / (100 - float(self.rentabilidad)) * 100
-        return precio_venta
+        return float(precio_venta) * float(self.cantidad)
 
     def save(self, *args, **kwargs):
         # Calcula el precio unitario y total antes de guardar
         self.precio_unitario = self.precio_unitario_calculado()
-        self.precio_total = self.precio_unitario * self.cantidad
+        self.precio_total = self.precio_unitario
         super().save(*args, **kwargs)
 
     class Meta:

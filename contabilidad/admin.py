@@ -76,7 +76,7 @@ class CuentasContablesAdmin(ImportExportModelAdmin):
     # Fields to display in the list view
     list_display = ('tipo_cuenta', 'numero', 'descripcion', 'saldo')
     # Fields that will be read-only
-    readonly_fields = ('tipo_cuenta', 'numero', 'descripcion','moneda', )
+   # readonly_fields = ('tipo_cuenta', 'numero', 'descripcion','moneda', )
     # Fields to filter the records by
     list_filter = ('numero', 'descripcion', 'tipo_cuenta')
     # Pagination size for the list view

@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from inventario.models import Categoria
+
 class Landing(models.Model):
 
     nombre = models.CharField(max_length=255, blank=False, null=False, default='pagina_inicio', unique=True)
@@ -17,30 +19,11 @@ class Landing(models.Model):
     hero_description = models.CharField(max_length=200, null=True, blank=False)
 
     section_category = models.BooleanField(default=False)
-    category_1 = models.CharField(max_length=200, null=True, blank=False)
-    category_1_image = models.ImageField(
-            upload_to='img/landing/',
-            blank=True,
-            null=True,
-        )
-    category_2 = models.CharField(max_length=200, null=True, blank=False)
-    category_2_image = models.ImageField(
-            upload_to='img/landing/',
-            blank=True,
-            null=True,
-        )
-    category_3 = models.CharField(max_length=200, null=True, blank=False)
-    category_3_image = models.ImageField(
-            upload_to='img/landing/',
-            blank=True,
-            null=True,
-        )
-    category_4 = models.CharField(max_length=200, null=True, blank=False)
-    category_4_image = models.ImageField(
-            upload_to='img/landing/',
-            blank=True,
-            null=True,
-        )
+    category_1 = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="landing_category_1")
+    category_2 = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="landing_category_2")
+    category_3 = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="landing_category_3")
+    category_4 = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name="landing_category_4")
+
 
     section_gallery = models.BooleanField(default=False)
     gallery_1_image = models.ImageField(upload_to='img/landing/',blank=True,null=True)

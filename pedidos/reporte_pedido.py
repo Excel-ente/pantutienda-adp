@@ -16,7 +16,8 @@ def obtener_datos_reporte(queryset):
         "stock_actual": 0,
         "unidad_medida": None,
         "ultimo_costo": 0,
-        "subtotal": 0
+        "subtotal": 0,
+        "rentabilidad": 0 
     })
 
     for pedido in queryset:
@@ -43,8 +44,10 @@ def obtener_datos_reporte(queryset):
                     cantidad = float(cantidad) * float(item.producto_precio.cantidad) * 16
 
             key = (proveedor, producto.codigo, producto.nombre, unidad_base)
-            subtotal = float(item.producto.costo_unitario) * float(cantidad)
             costo_unit = float(item.producto.costo_unitario)
+            precio_unit_venta = item.producto_precio.precio_unitario_calculado()  # Precio de venta calculado
+            subtotal = costo_unit * float(cantidad)
+            rentabilidad_unitaria = precio_unit_venta - costo_unit
 
             # Actualizar datos agrupados
             datos_agrupados[key]["cantidad_solicitada"] += cantidad
@@ -52,6 +55,7 @@ def obtener_datos_reporte(queryset):
             datos_agrupados[key]["unidad_medida"] = unidad_base
             datos_agrupados[key]["ultimo_costo"] = costo_unit
             datos_agrupados[key]["subtotal"] += subtotal
+            datos_agrupados[key]["rentabilidad"] += rentabilidad_unitaria * cantidad
 
     # Convertir a lista de diccionarios para el reporte
     datos = []
@@ -64,12 +68,13 @@ def obtener_datos_reporte(queryset):
             "Código": codigo,
             "Nombre": nombre,
             "Unidad de Medida": unidad_base,
-            "Stock solicitado": round(valores["cantidad_solicitada"],2),
-            "Stock actual": round(valores["stock_actual"],2),
+            "Solicitado": round(valores["cantidad_solicitada"],2),
+            "Disponible": round(valores["stock_actual"],2),
             "Diferencia": round(diferencia,2),
             "Estado stock": estado_stock,
             "Último Costo": round(valores["ultimo_costo"],2),
             "Subtotal": round(valores["subtotal"],2),
+            "Ganancias Estimadas": round(valores["rentabilidad"], 2)  # Nueva columna de rentabilidad
         })
 
     return datos
@@ -84,7 +89,7 @@ def exportar_a_excel(modeladmin, request, queryset):
     df.to_excel(response, index=False)
     return response
 
-# Acción para exportar a PDF
+
 def exportar_a_pdf(modeladmin, request, queryset):
     datos = obtener_datos_reporte(queryset)
 
@@ -103,36 +108,43 @@ def exportar_a_pdf(modeladmin, request, queryset):
 
     # Crear una tabla por cada proveedor
     for proveedor, items in datos_por_proveedor.items():
-        elements.append(Paragraph(f"Proveedor: {proveedor}", styles['Heading2']))
+        elements.append(Paragraph(f"Productos a comprar al proveedor: {proveedor}", styles['Heading2']))
         
         # Encabezado de la tabla
         data = [
-            ["Código", "Descripción", "Cantidad Solicitada", "Stock Disponible", "Diferencia", "Estado", "Último Costo", "Subtotal"]
+            ["Código", "Descripción", "Solicitado", "Disponible", "Diferencia", "Estado", "Último Costo", "Subtotal", "Ganancias Estimadas"]
         ]
         
         total_inversion = 0
         total_sin_stock = 0
+        total_rentabilidad = 0
 
         for item in items:
-            total_inversion += item["Subtotal"]
-            total_sin_stock += item["Subtotal"] if item["Diferencia"] < 0 else 0
+            total_sin_stock += item["Último Costo"] * item["Diferencia"] if item["Diferencia"] < 0 else 0
+            total_inversion += item["Subtotal"] + total_sin_stock
+            total_rentabilidad += item["Ganancias Estimadas"]
+
             data.append([
                 item["Código"],
                 item["Nombre"],
-                f"{item['Stock solicitado']} {item['Unidad de Medida']}",
-                item["Stock actual"],
+                f"{item['Solicitado']} {item['Unidad de Medida']}",
+                item["Disponible"],
                 item["Diferencia"],
                 item["Estado stock"],
                 f"${item['Último Costo']:,.2f}",
-                f"${item['Subtotal']:,.2f}"
+                f"${item['Subtotal']:,.2f}",
+                f"${item['Ganancias Estimadas']:,.2f}"
             ])
 
         # Totales
-        data.append(["", "", "", "", "", "", "Total Inversión", f"${total_inversion:,.2f}"])
-        data.append(["", "", "", "", "", "", "Total sin contar stock",  f"${total_sin_stock:,.2f}"])
+        data.append(["", "", "", "", "", "","", "", "",])
+        data.append(["", "", "", "", "", "","", "Inversión total", f"${total_inversion:,.2f}"])
+        data.append(["", "", "", "", "", "","", "Inversión extra", f"${total_sin_stock:,.2f}"])
+        data.append(["", "", "", "", "", "","", "Ganancias esperadas", f"${total_rentabilidad:,.2f}"])
+        
 
         # Crear y agregar la tabla al PDF
-        table = Table(data, colWidths=[1*inch, 2*inch, 1.2*inch, 1*inch, 1*inch, 1*inch, 1*inch, 1.5*inch])
+        table = Table(data, colWidths=[1*inch, 2*inch, 1.2*inch, 1*inch, 1*inch, 1*inch, 1*inch, 1.5*inch, 1.5*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -152,3 +164,4 @@ def exportar_a_pdf(modeladmin, request, queryset):
     buffer.close()
     response.write(pdf)
     return response
+

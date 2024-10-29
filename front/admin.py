@@ -1,13 +1,13 @@
 from django.contrib import admin
 from .models import Landing, Section
 from django.utils.html import format_html
-
+from import_export.admin import ImportExportModelAdmin
 class SectionInline(admin.TabularInline):
     model = Section
     extra = 1  # Permitir agregar más secciones
 
 
-class LandingAdmin(admin.ModelAdmin):
+class LandingAdmin(ImportExportModelAdmin):
     list_display = ('nombre','section_hero','section_category','section_gallery','about_us','testimonials','features','cta_section','newsletter')
     inlines = [SectionInline,]
     fieldsets = (
@@ -16,8 +16,7 @@ class LandingAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
         ('Category Section', {
-            'fields': ('section_category', 'category_1', 'category_1_image', 'category_2', 'category_2_image', 
-                       'category_3', 'category_3_image', 'category_4', 'category_4_image'),
+            'fields': ('section_category', 'category_1', 'category_2', 'category_3', 'category_4'),
             'classes': ('collapse',),
         }),
         ('Gallery Section', {

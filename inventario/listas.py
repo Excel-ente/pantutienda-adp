@@ -1,5 +1,9 @@
 
 
+TIPO_CHOICES = [
+    ('Simple', 'Simple'),
+    ('Compuesto', 'Compuesto')
+]
 UNIDADES_DE_MEDIDA = [
         ('Unidades', 'Unidades'),
         ('Kilos', 'Kilos'),

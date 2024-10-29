@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from front.models import Landing
 from inventario.models import Producto,ProductoPrecio
-from monitoreo.views import obtener_info_ip
+from seguridad.views import obtener_info_ip
 from pedidos.models import Pedido
 from agenda.models import Cliente,Proveedor,Chofer,Vendedor,DireccionEntregaCliente
 from django.contrib.auth.decorators import login_required
@@ -17,7 +17,7 @@ from django.utils.safestring import mark_safe
 import json
 from datetime import timedelta
 from django.utils import timezone
-from monitoreo.models import FailedLoginAttempt
+from seguridad.models import FailedLoginAttempt
 # ------------------------------------------------------------------------------------------
 # Funciones
 def obtener_perfil(user):

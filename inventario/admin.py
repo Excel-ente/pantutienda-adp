@@ -90,6 +90,21 @@ class PresentacionAdmin(ImportExportModelAdmin):
 # -----------------------------------------------------------------------------
 # Vista Producto
 # 
+# Vista para el precio d
+class RecetaProductoInline(admin.StackedInline):
+    model = RecetaProducto
+    extra = 1
+    fk_name = 'producto_principal'
+    fields = ('producto_usado','cantidad','unidad_de_medida','Costo_calculado',)
+    readonly_fields = ('Costo_calculado',)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('producto_usado')
+
+    def Costo_calculado(self, obj):
+        moneda = configuracion.objects.first().Moneda
+        return f"{moneda.signo} {obj.Costo_calculado():,.2f}"
+
 
 # Vista para el precio del producto en el modelo de producto
 class ProductoPrecioInline(admin.StackedInline):
@@ -113,12 +128,13 @@ class ProductoPrecioInline(admin.StackedInline):
 
         return fields
 
+
     def Rentabilidad(self, obj):
         return f"% {obj.rentabilidadNeta:,.2f}"
 
     def Costo_unitario(self, obj):
         moneda = configuracion.objects.first().Moneda
-        return f"{moneda.signo} {obj.producto.costo_unitario:,.2f} x {obj.producto.unidad_de_medida}"
+        return f"{moneda.signo} {obj.costo_unit():,.2f} x {obj.producto.unidad_de_medida}"
 
     def Precio_unitario(self, obj):
         moneda = configuracion.objects.first().Moneda
@@ -143,7 +159,6 @@ class MovimientoProductoInline(admin.TabularInline):
         return False  # Desactivar la capacidad de eliminar ventas desde el admin de Cliente
 
 # Vista Producto
-
 class ProductoResource(resources.ModelResource):
     categoria = fields.Field(attribute='categoria__nombre', column_name='categoria', widget=widgets.ForeignKeyWidget(Categoria, 'nombre'))
     primer_producto_precio = fields.Field(attribute='primer_producto_precio', column_name='primer_producto_precio')
@@ -229,8 +244,15 @@ class ProductoAdmin(ImportExportModelAdmin):
     search_fields = ('codigo','nombre')
     exclude = ('cantidad','proveedor''ultima_modificacion','habilitar_venta')#'costo_unitario','imagen',
     actions = [habilitar_productos_masivamente,deshabilitar_productos_masivamente]
-    inlines = [ProductoPrecioInline,MovimientoProductoInline]
+    inlines = [ProductoPrecioInline,MovimientoProductoInline,RecetaProductoInline]
 
+    # Solo muestra el inline si el producto es "compuesto"
+    def get_inlines(self, request, obj=None):
+        if obj and obj.tipo == 'Compuesto':
+            return [ProductoPrecioInline,MovimientoProductoInline,RecetaProductoInline]
+        else:
+            return [ProductoPrecioInline,MovimientoProductoInline]
+   
     def mostrar_imagen_form(self, obj):
         if obj.imagen:
             return format_html('<img src="{}" width="200" height="200" style="border-radius:5px;"/>', obj.imagen.url)
@@ -276,24 +298,31 @@ class ProductoAdmin(ImportExportModelAdmin):
             # Si no, ocultamos 'codigo'
             return ('mostrar_imagen','nombre', 'costo_ultimo_unitario', 'precio', 'en_inventario', 'publicado')
         
+    def get_readonly_fields(self, request, obj=None):
+        # Si el producto es de tipo compuesto, ocultar `costo_ultimo_unitario`
+        fields = ['mostrar_imagen_form', 'proveedor', 'precio', 'stock_actual', 'deshabilitar']
+        if obj and obj.tipo == 'Compuesto':
+            fields.append('costo_unitario')
+        return fields
+
     def en_inventario(self,obj):
         texto=obj.stock_actual_str
         return texto
 
     def costo_ultimo_unitario(self,obj):
-        moneda=configuracion.objects.first().Moneda.signo
-        precio_select=obj.costo_unitario
-        if precio_select:
-            precio=precio_select
+        moneda = configuracion.objects.first().Moneda.signo
+        if obj.tipo == 'Compuesto':
+            precio_select = obj.costo_unitario_calculado()
         else:
-            precio=0
-        return f'{moneda} {precio:,.2f}'
+            precio_select = obj.costo_unitario
+
+        return f'{moneda} {precio_select:,.2f}'
     
     def precio(self,obj):
         moneda=configuracion.objects.first().Moneda.signo
         precio_select=obj.primer_producto_precio
         if precio_select:
-            precio=precio_select.precio_total
+            precio=precio_select.precio_unitario_calculado()
         else:
             precio=0
         return f'{moneda} {precio:,.2f}'

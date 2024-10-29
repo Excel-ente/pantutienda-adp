@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'import_export',
-    'monitoreo',
+    'seguridad',
     'front',
     'mensajeria',
     'configuracion',
@@ -165,7 +165,10 @@ LOGIN_REDIRECT_URL = '/'  # Cambia 'home' por la vista a donde quieras redirigir
 LOGOUT_REDIRECT_URL = '/'  # Redirigir después del logout
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/static/'
+if DEBUG == True:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+else:
+    STATIC_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/static/'
 
 #STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
@@ -175,7 +178,10 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/media/'
+if DEBUG == True:
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+else:
+    MEDIA_ROOT = '/home/ubuntu/aplicaciones/pantutienda-adp/media/'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
@@ -241,7 +247,7 @@ JAZZMIN_SETTINGS = {
         {"app": "contabilidad", "collapsible": True, "icon": "fas fa-app"},
         {"app": "inventario", "collapsible": True, "icon": "fas fa-app"},
         {"app": "front", "collapsible": True, "icon": "fas fa-app"},   
-        {"app": "monitoreo", "collapsible": True, "icon": "fas fa-app"},  
+        {"app": "seguridad", "collapsible": True, "icon": "fas fa-app"},  
                      
     ],
     
@@ -266,7 +272,7 @@ JAZZMIN_SETTINGS = {
         'reportes',
         'mensajeria',
         'front',
-        'monitoreo'
+        'seguridad'
         ],
 
     # Hide these models when generating side menu (e.g auth.user)

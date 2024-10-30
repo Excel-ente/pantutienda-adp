@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+
+from pedidos.utils import generar_movimiento_venta
 from .models import Pedido, ItemPedido
 from agenda.models import Cliente
 from configuracion.models import configuracion
@@ -22,25 +24,26 @@ def confirmar_pedido(request, id):
             pedido.estado = 'completado'
             pedido.save()
             messages.success(request, f'Pedido completado!')
-            return redirect('admin:pedidos_pedido_changelist')
+            
         else:
             pedido.estado = 'en_preparacion'
             pedido.save()
             messages.success(request, f'Pedido en preparación!')
-            return redirect('admin:pedidos_pedido_changelist')
+      
     else:
         if not config.gestionar_armar_pedido:
             pedido.estado = 'listo'
             pedido.save()
             messages.success(request, f'Pedido completado!')
-            return redirect('admin:pedidos_pedido_changelist')
+         
         else:
             pedido.estado = 'en_preparacion'
             pedido.save()
             messages.success(request, f'Pedido en preparación!')
-            return redirect('admin:pedidos_pedido_changelist')
-        
-        
+           
+    generar_movimiento_venta(pedido)
+    return redirect('admin:pedidos_pedido_changelist')
+
 @login_required(login_url='/admin/login/')
 def confirmar_armado_pedido(request, id):
     pedido = get_object_or_404(Pedido, id=id)
@@ -49,8 +52,6 @@ def confirmar_armado_pedido(request, id):
     messages.success(request, f'El pedido ha sido armado correctamente.')
 
     return redirect('admin:pedidos_pedido_changelist')
-
-
 
 @login_required(login_url='/admin/login/')
 def iniciar_armado_pedido(request, id):
@@ -61,18 +62,14 @@ def iniciar_armado_pedido(request, id):
 
     return redirect('admin:pedidos_pedido_changelist')
 
-
 @login_required(login_url='/admin/login/')
-def finalizar_armado_pedido(request, id):
+def finalizar_entrega_pedido(request, id):
     pedido = get_object_or_404(Pedido, id=id)
     pedido.estado = 'completado'
     pedido.save()
-    messages.success(request, f'El pedido ha sido armado correctamente.')
+    messages.success(request, f'El pedido ha sido entregado correctamente.')
 
     return redirect('admin:pedidos_pedido_changelist')
-
-
-
 
 # -----------------------------------------------------------------------------------------
 # vistas del carrito ----------------------------------------------------------------------

@@ -2,8 +2,9 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
+from configuracion.forms import ConfiguracionForm
 from front.models import Landing
-from inventario.models import Producto,ProductoPrecio
+from inventario.models import Categoria, Deposito, Producto,ProductoPrecio
 from seguridad.views import obtener_info_ip
 from pedidos.models import Pedido
 from agenda.models import Cliente,Proveedor,Chofer,Vendedor,DireccionEntregaCliente
@@ -124,16 +125,37 @@ def cuenta_no_verificada(request):
 # ------------------------------------------------------------------------------------------
 # Vistas App
 
+def landing(request):
+
+    # Contexto que se pasará al template
+    context = {
+        'usuario': '1',
+    }
+    
+    return render(request, 'landing_example_0.html',context)
+
 
 def home(request):
+
+
+    config = configuracion.objects.first() # Asegúrate de que haya una landing en la base de datos
+
+    if not config:
+        return redirect('landing')  # Si no hay un objeto landing, renderiza una página de error o similar.
+
     landing = Landing.objects.first()  # Asegúrate de que haya una landing en la base de datos
 
     if not landing:
-        return render(request, '404.html')  # Si no hay un objeto landing, renderiza una página de error o similar.
+        return redirect('onboarding')  # Si no hay un objeto landing, renderiza una página de error o similar.
+
+
+
 
     # Obtén las secciones activas y ordenadas
     secciones = landing.section_set.filter(is_active=True).order_by('order')
 
+    # Obtén las categorías activas
+    categorias = Categoria.objects.all()
 
     # Si el usuario está autenticado, obtenemos su perfil
     if request.user.is_authenticated:
@@ -141,6 +163,7 @@ def home(request):
         context = {
             'landing': landing,
             'secciones': secciones,
+            'categorias': categorias,
             'usuario': request.user.username,
             'tipo_cliente': perfil['tipo_cliente'],
             'numero_usuario': perfil['numero_usuario'],
@@ -152,6 +175,7 @@ def home(request):
         context = {
             'landing': landing,
             'secciones': secciones,
+            'categorias': categorias,
             'usuario': 'Anónimo',
             'numero_usuario': None,
             'tipo_cliente': 'Visitante',
@@ -167,6 +191,7 @@ def home(request):
 # ------------------------------------------------------------------------------------------
 
 def carrito(request):
+    
     usuario = request.user
 
     if usuario.is_authenticated:
@@ -280,25 +305,30 @@ def pedidos_view(request):
 # ------------------------------------------------------------------------------------------
 
 
-import json  # Asegúrate de importar el módulo json
+import json
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def confirmar_pedido(request):
-
-
     cliente = Cliente.objects.filter(usuario=request.user).first()
+    depositos = Deposito.objects.all()  # Obtén los depósitos disponibles
+    depositos_list = [{'id': deposito.id, 'nombre': deposito.nombre} for deposito in depositos]
+
+
 
     if not cliente:
         return JsonResponse({'error': 'No tienes una cuenta de cliente asociada.'}, status=400)
 
     pedido = Pedido.objects.filter(cliente=cliente, estado='abierto').first()
-  
-
     if not pedido:
         return JsonResponse({'error': 'No tienes un pedido abierto.'}, status=404)
 
     if request.method == "GET":
-   
+        # Obtener los productos del pedido y calcular los totales
         items = [
             {
                 'producto': item.producto.nombre,
@@ -311,35 +341,47 @@ def confirmar_pedido(request):
 
         # Obtener todas las direcciones del cliente
         direcciones = DireccionEntregaCliente.objects.filter(Cliente=cliente)
-        direcciones_list = [
-            {'id': direccion.id, 'direccion': direccion.direccion}
-            for direccion in direcciones
-        ]
+        direcciones_list = [{'id': direccion.id, 'direccion': direccion.direccion} for direccion in direcciones]
 
-        return JsonResponse({'items': items, 'total': total, 'direcciones': direcciones_list})
+        return JsonResponse({'items': items, 'total': total, 'direcciones': direcciones_list,'depositos': depositos_list})
 
     if request.method == "POST":
-        
-        data = json.loads(request.body)
-   
-        direccion_id = data.get('direccion_id')
-    
-        if not direccion_id:
-            return JsonResponse({'error': 'No se proporcionó una dirección.'}, status=400)
-
         try:
-            direccion = DireccionEntregaCliente.objects.get(id=direccion_id, Cliente=cliente)
-        except DireccionEntregaCliente.DoesNotExist:
-            return JsonResponse({'error': 'La dirección seleccionada no es válida.'}, status=400)
+            data = json.loads(request.body)
+            direccion_id = data.get('direccion_id')
+            deposito_id = data.get('deposito_id')
 
+            # Obtener depósito predeterminado si no se proporciona `deposito_id`
+            if not deposito_id:
+                configuracion_obj = configuracion.objects.first()
+                if configuracion_obj:
+                    deposito_id = configuracion_obj.deposito_id  # Asegúrate de que `deposito_id` esté en `configuracion`
+                else:
+                    return JsonResponse({'error': 'No se pudo determinar el depósito.'}, status=400)
 
-        pedido.estado = 'pendiente'
-        pedido.direccion_entrega_cliente = direccion
-        pedido.save()
+            # Validar `direccion_id`
+            if not direccion_id:
+                return JsonResponse({'error': 'No se proporcionó una dirección.'}, status=400)
 
-        return JsonResponse({'success': True})
+            # Obtener la dirección de entrega seleccionada
+            try:
+                direccion = DireccionEntregaCliente.objects.get(id=direccion_id, Cliente=cliente)
+            except DireccionEntregaCliente.DoesNotExist:
+                return JsonResponse({'error': 'La dirección seleccionada no es válida.'}, status=400)
 
+            # Actualizar el pedido con la dirección y el depósito seleccionados
+            pedido.deposito_id = deposito_id
+            pedido.estado = 'pendiente'
+            pedido.direccion_entrega_cliente = direccion
+            pedido.save()
 
+            return JsonResponse({'success': True})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Datos de solicitud no válidos.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+        
 
 
 def is_ip_blocked(ip):
@@ -396,22 +438,40 @@ def custom_login(request):
     
     return render(request, 'login.html')
     
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.db import IntegrityError, transaction
+from django.contrib.auth import login
+
 def registro(request):
-
     if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
 
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        
+        # Validaciones de campos vacíos
+        if not username or not email or not password:
+            messages.error(request, 'Todos los campos son obligatorios.')
+            return redirect('registro')
+
+        # Validación de usuario duplicado
         if User.objects.filter(username=username).exists():
             messages.error(request, 'El usuario ya existe.')
             return redirect('registro')
 
-        user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
-        messages.success(request, 'Registro exitoso. Bienvenido!')
-        return redirect('/')
+        try:
+            # Asegura la creación dentro de una transacción
+            with transaction.atomic():
+                user = User.objects.create_user(username=username, email=email, password=password)
+                login(request, user)
+                messages.success(request, 'Registro exitoso. Bienvenido!')
+                return redirect('/')
+        
+        except IntegrityError as e:
+            messages.error(request, 'Error de integridad: Verifica los datos ingresados.')
+            return redirect('registro')
 
     return render(request, 'registro.html')
 # ------------------------------------------------------------------------------------------

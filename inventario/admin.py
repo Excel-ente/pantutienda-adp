@@ -10,11 +10,13 @@ from django.utils import timezone
 
 # -----------------------------------------------------------------------------
 # Vista Deposito
-# 
+#
+
 @admin.register(ProductoPrecio)
 class ProductoPrecioAdmin(ImportExportModelAdmin):
     list_display =('id','lista','producto','presentacion','cantidad','unidad_de_medida','precio_unitario')
     readonly_fields =('id','lista','producto','presentacion','cantidad','unidad_de_medida','precio_unitario')
+
 
     def has_add_permission(self, request, obj=None):
         # Disables the ability to add new records directly in the admin

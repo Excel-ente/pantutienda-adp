@@ -1,5 +1,5 @@
 from django.db import models
-from inventario.models import Producto,ProductoPrecio
+from inventario.models import Producto,ProductoPrecio,Deposito
 from agenda.models import Cliente,DireccionEntregaCliente
 from django.core.exceptions import ValidationError
 from configuracion.envio_mails import send_mail_nuevo_pedido
@@ -19,6 +19,7 @@ class Pedido(models.Model):
     direccion_entrega_cliente = models.ForeignKey(DireccionEntregaCliente, on_delete=models.CASCADE,null=True)
     creado_en = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='abierto')
+    deposito = models.ForeignKey(Deposito, on_delete=models.PROTECT,verbose_name='Deposito salida',blank=True,null=True,default=1,help_text='Deposito donde saldrá la mercadería.')
 
     def clean(self):
         if self.estado != 'abierto' and self.estado != 'pendiente':
@@ -32,7 +33,6 @@ class Pedido(models.Model):
     #         send_mail_nuevo_pedido(self)
     #     else:
     #         super().save(*args, **kwargs)
-
 
     def total(self):
         return sum(item.subtotal() for item in self.items.all())
@@ -54,6 +54,23 @@ class ItemPedido(models.Model):
 
     def subtotal(self):
         return self.precio_unitario * self.cantidad
+
+    def cantidad_madre(self):
+        cantidad = round(float(self.producto_precio.cantidad) * float(self.cantidad),2)
+        if self.producto_precio.unidad_de_medida != self.producto.unidad_de_medida:
+            if self.producto_precio.unidad_de_medida == "Kilos" or self.producto_precio.unidad_de_medida == "Litros":
+                cantidad = float(cantidad) * 1000
+            elif self.producto_precio.unidad_de_medida == "Gramos" or self.producto_precio.unidad_de_medida == "Mililitros":
+                cantidad = float(cantidad) / 1000
+            elif self.producto_precio.unidad_de_medida == "Mts":
+                cantidad = float(cantidad) * 100
+            elif self.producto_precio.unidad_de_medida == "Cms":
+                cantidad = float(cantidad) / 100 
+            elif self.producto_precio.unidad_de_medida == "Onzas":
+                cantidad = float(cantidad) / 16
+            elif self.producto_precio.unidad_de_medida == "Libras":
+                cantidad = float(cantidad) * 16  
+        return cantidad
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre} (Pedido #{self.pedido.id})"

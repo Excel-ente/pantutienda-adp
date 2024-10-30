@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantutuenda - El Futuro de la Gestión de Negocios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4ECDC4;
+            --accent-color: #FFD93D;
+            --text-color: #333;
+            --background-color: #f4f4f4;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-family: 'Orbitron', sans-serif;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-color);
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: transparent;
+            color: var(--accent-color);
+        }
+        section {
+            padding: 100px 0;
+        }
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-color) 10%, transparent 10%),
+                        radial-gradient(circle, var(--accent-color) 10%, transparent 10%);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            transform: rotate(45deg);
+            transition: opacity 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        .feature-card:hover::before {
+            opacity: 0.2;
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .cat-ears {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50% 50% 0 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .cat-ears::before,
+        .cat-ears::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 30px;
+            height: 30px;
+            background-color: var(--card-bg);
+            border-radius: 50%;
+        }
+        .cat-ears::before {
+            left: -15px;
+        }
+        .cat-ears::after {
+            right: -15px;
+        }
+        .feature-card:hover .cat-ears {
+            opacity: 1;
+        }
+        .how-it-works {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .step {
+            flex: 1;
+            min-width: 250px;
+            margin: 20px;
+            text-align: center;
+            position: relative;
+        }
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            line-height: 50px;
+            margin-bottom: 20px;
+        }
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        .step:last-child::after {
+            display: none;
+        }
+        .cta {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta::before {
+            content: '🐾';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            top: -50px;
+            left: -50px;
+            transform: rotate(-45deg);
+        }
+        .cta::after {
+            content: '🐾';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            bottom: -50px;
+            right: -50px;
+            transform: rotate(135deg);
+        }
+        .cta h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .how-it-works {
+                flex-direction: column;
+                align-items: center;
+            }
+            .step::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#caracteristicas">Características</a></li>
+                <li><a href="#como-funciona">Cómo Funciona</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-content">
+                <h1>Pantutuenda</h1>
+                <p>El futuro de la gestión de negocios está aquí</p>
+                <a href="#caracteristicas" class="btn">Descubre la Magia</a>
+            </div>
+        </section>
+
+        <section id="caracteristicas">
+            <div class="container">
+                <h2>Características Felinas</h2>
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">🏷️</div>
+                        <h3>Precios Personalizados</h3>
+                        <p>Gestiona múltiples listas de precios con la agilidad de un gato.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">📊</div>
+                        <h3>Reportes Avanzados</h3>
+                        <p>Analiza tu negocio con la precisión de los bigotes de un felino.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">🎨</div>
+                        <h3>Diseño Personalizable</h3>
+                        <p>Adapta tu página como un gato se adapta a cualquier espacio.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">🍱</div>
+                        <h3>Gestión de Productos</h3>
+                        <p>Organiza tus productos con la elegancia de un gato paseando.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">👥</div>
+                        <h3>Gestión de Equipo</h3>
+                        <p>Coordina tu equipo con la sincronía de una colonia de gatos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="cat-ears"></div>
+                        <div class="feature-icon">📈</div>
+                        <h3>Análisis de Compras</h3>
+                        <p>Observa tus compras con la atención de un gato mirando un puntero láser.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="como-funciona">
+            <div class="container">
+                <h2>Cómo Funciona</h2>
+                <div class="how-it-works">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Configura tu Cuenta</h3>
+                        <p>Personaliza tu perfil con la minuciosidad de un gato acicalándose.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Gestiona tus Ventas</h3>
+                        <p>Maneja tus ventas con la agilidad de un gato cazando.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Optimiza tu Negocio</h3>
+                        <p>Mejora tu negocio con la astucia de un gato encontrando el mejor lugar para dormir.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>¿Listo para dar el salto felino?</h2>
+                <p>Únete a Pantutuenda hoy y lleva tu negocio al siguiente nivel</p>
+                <a href="#" class="btn">¡Empieza Ahora!</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Pantutuenda. Todos los derechos reservados. 🐾</p>
+        </div>
+    </footer>
+
+    <script>
+        // Three.js animation for hero section
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true });
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+
+        camera.position.z = 30;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            torusKnot.rotation.x += 0.01;
+            torusKnot.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for fade-in animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .step').forEach(el => {
+            el.style.opacity = "0";
+            el.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+            observer.observe(el);
+        });
+
+        // Add fade-in class for animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .fade-in {
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                }
+            </style>
+        `);
+    </script>
+</body>
+</html>

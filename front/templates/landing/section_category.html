@@ -24,36 +24,35 @@
         margin: 0;
         font-size: 1.2rem;
         text-align: center;
+        color: black; /* Texto en negro */
+        text-decoration: none; /* Sin subrayado */
+    }
+
+    .category-item a {
+        text-decoration: none; /* Evita que el enlace esté subrayado */
+        color: inherit; /* Hereda el color del texto */
     }
     </style>
     
     <section class="categories">
-        <div class="">
+        <div class="container">
             <div class="row">
-                <div class="col-6 col-md-3">
-                    <div class="category-item">
-                        <img src="{% if landing.category_1_image %}{{ landing.category_1_image.url }}{% else %}https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ landing.category_1 }}">
-                        <h3>{{ landing.category_1 }}</h3>
+                {% for categoria in categorias %}
+                    <div class="col-6 col-md-3">
+                        <div class="category-item">
+                            <a href="{% url 'productos' %}?categoria={{ categoria.id }}">
+                                <div class="category-inner">
+                                    <!-- Front Side -->
+                                    <div class="category-front">
+                                        <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ categoria.imagen }}">
+                                        <h3>{{ categoria }}</h3>
+                                    </div>
+
+                                </div>
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="category-item">
-                        <img src="{% if landing.category_2_image %}{{ landing.category_2_image.url }}{% else %}https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ landing.category_2 }}">
-                        <h3>{{ landing.category_2 }}</h3>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="category-item">
-                        <img src="{% if landing.category_3_image %}{{ landing.category_3_image.url }}{% else %}https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ landing.category_3 }}">
-                        <h3>{{ landing.category_3 }}</h3>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="category-item">
-                        <img src="{% if landing.category_4_image %}{{ landing.category_4_image.url }}{% else %}https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ landing.category_4 }}">
-                        <h3>{{ landing.category_4 }}</h3>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </section>

@@ -1,6 +1,6 @@
 import pandas as pd
 from django.http import HttpResponse
-from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.pagesizes import landscape, LEGAL
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import inch
@@ -8,16 +8,29 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from io import BytesIO
 from collections import defaultdict
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+from io import BytesIO
+from django.http import HttpResponse
+from collections import defaultdict
+
 
 # Función para obtener los datos agrupados
 def obtener_datos_reporte(queryset):
+
     datos_agrupados = defaultdict(lambda: {
         "cantidad_solicitada": 0,
         "stock_actual": 0,
         "unidad_medida": None,
-        "ultimo_costo": 0,
-        "subtotal": 0,
-        "rentabilidad": 0 
+        "costo_unitario": 0,
+        "subtotal_costo": 0,
+        "total_precio_unitario": 0,
+        "total_precio_venta": 0,
+        "rentabilidad": 0,
+        "total_precio_venta": 0,
     })
 
     for pedido in queryset:
@@ -45,41 +58,54 @@ def obtener_datos_reporte(queryset):
 
             key = (proveedor, producto.codigo, producto.nombre, unidad_base)
             costo_unit = float(item.producto.costo_unitario)
-            precio_unit_venta = item.producto_precio.precio_unitario_calculado()  # Precio de venta calculado
-            subtotal = costo_unit * float(cantidad)
-            rentabilidad_unitaria = precio_unit_venta - costo_unit
+            precio_unit_venta = item.producto_precio.precio_unitario_madre()
+            subtotal_costo = costo_unit * float(cantidad)
 
-            # Actualizar datos agrupados
+
             datos_agrupados[key]["cantidad_solicitada"] += cantidad
-            datos_agrupados[key]["stock_actual"] = producto.stock_actual
+            datos_agrupados[key]["stock_actual"] = float(max(0, producto.stock_actual))  # No contar stock negativo
+            datos_agrupados[key]["costo_unitario"] = costo_unit
+            datos_agrupados[key]["subtotal_costo"] = subtotal_costo
+            datos_agrupados[key]["total_precio_unitario"] = precio_unit_venta
+            datos_agrupados[key]["total_precio_venta"] += precio_unit_venta * cantidad
+            datos_agrupados[key]["rentabilidad"] += round((precio_unit_venta* cantidad)- subtotal_costo,2)
             datos_agrupados[key]["unidad_medida"] = unidad_base
-            datos_agrupados[key]["ultimo_costo"] = costo_unit
-            datos_agrupados[key]["subtotal"] += subtotal
-            datos_agrupados[key]["rentabilidad"] += rentabilidad_unitaria * cantidad
+        
 
-    # Convertir a lista de diccionarios para el reporte
+    # Calcular el precio de venta ponderado y organizar los datos
     datos = []
     for (proveedor, codigo, nombre, unidad_base), valores in datos_agrupados.items():
-        diferencia = float(valores["stock_actual"]) - float(valores["cantidad_solicitada"])
-        estado_stock = "OK" if diferencia >= 0 else f"Falta {abs(round(diferencia,2))}"
+        diferencia = max(0, valores["cantidad_solicitada"] - valores["stock_actual"])
+        estado_stock = f"Faltante {abs(round(diferencia, 2))}" if diferencia > 0 else "OK"
+        precio_venta_unitario = valores["total_precio_unitario"]
+        precio_venta_total = valores["total_precio_venta"]
+        
+        # Inversión faltante solo para la cantidad faltante
+        inversion_faltante = diferencia * valores["costo_unitario"]
 
         datos.append({
             "Proveedor": proveedor,
             "Código": codigo,
             "Nombre": nombre,
             "Unidad de Medida": unidad_base,
-            "Solicitado": round(valores["cantidad_solicitada"],2),
-            "Disponible": round(valores["stock_actual"],2),
-            "Diferencia": round(diferencia,2),
+            "Solicitado": round(valores["cantidad_solicitada"], 2),
+            "Disponible": round(valores["stock_actual"], 2),
+            "Diferencia": round(diferencia, 2),
             "Estado stock": estado_stock,
-            "Último Costo": round(valores["ultimo_costo"],2),
-            "Subtotal": round(valores["subtotal"],2),
-            "Ganancias Estimadas": round(valores["rentabilidad"], 2)  # Nueva columna de rentabilidad
+            "Último Costo": round(valores["costo_unitario"], 2),
+            "Costo Total": round(valores["subtotal_costo"], 2),
+            "Precio Venta Unitario": round(precio_venta_unitario, 2),
+            "Total Pedido": round(precio_venta_total, 2),
+          
+            "Ganancias Estimadas": round(valores["rentabilidad"], 2),
+            "Inversión Faltante": round(inversion_faltante, 2)
         })
+
 
     return datos
 
-# Acción para exportar a Excel
+
+
 def exportar_a_excel(modeladmin, request, queryset):
     datos = obtener_datos_reporte(queryset)
     df = pd.DataFrame(datos)
@@ -89,79 +115,107 @@ def exportar_a_excel(modeladmin, request, queryset):
     df.to_excel(response, index=False)
     return response
 
-
+import zipfile
+from io import BytesIO
+# Acción para exportar a PDF
 def exportar_a_pdf(modeladmin, request, queryset):
     datos = obtener_datos_reporte(queryset)
 
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte_pedidos.pdf"'
-
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
-    elements = []
-    styles = getSampleStyleSheet()
-
-    # Agrupar datos por proveedor
-    datos_por_proveedor = defaultdict(list)
-    for item in datos:
-        datos_por_proveedor[item["Proveedor"]].append(item)
-
-    # Crear una tabla por cada proveedor
-    for proveedor, items in datos_por_proveedor.items():
-        elements.append(Paragraph(f"Productos a comprar al proveedor: {proveedor}", styles['Heading2']))
+    # Configurar el ZIP
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
         
-        # Encabezado de la tabla
-        data = [
-            ["Código", "Descripción", "Solicitado", "Disponible", "Diferencia", "Estado", "Último Costo", "Subtotal", "Ganancias Estimadas"]
-        ]
-        
-        total_inversion = 0
-        total_sin_stock = 0
-        total_rentabilidad = 0
+        # Agrupar datos por proveedor
+        datos_por_proveedor = defaultdict(list)
+        for item in datos:
+            datos_por_proveedor[item["Proveedor"]].append(item)
 
-        for item in items:
-            total_sin_stock += item["Último Costo"] * item["Diferencia"] if item["Diferencia"] < 0 else 0
-            total_inversion += item["Subtotal"] + total_sin_stock
-            total_rentabilidad += item["Ganancias Estimadas"]
+        for proveedor, items in datos_por_proveedor.items():
+            # Crear un buffer para el PDF de cada proveedor
+            pdf_buffer = BytesIO()
+            doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(LEGAL), leftMargin=30, rightMargin=30, topMargin=40, bottomMargin=40)
+            elements = []
+            styles = getSampleStyleSheet()
 
-            data.append([
-                item["Código"],
-                item["Nombre"],
-                f"{item['Solicitado']} {item['Unidad de Medida']}",
-                item["Disponible"],
-                item["Diferencia"],
-                item["Estado stock"],
-                f"${item['Último Costo']:,.2f}",
-                f"${item['Subtotal']:,.2f}",
-                f"${item['Ganancias Estimadas']:,.2f}"
-            ])
+            title_style = ParagraphStyle(
+                'TitleStyle',
+                parent=styles['Heading2'],
+                fontSize=16,
+                spaceAfter=14,
+                textColor=colors.HexColor("#1D3557")
+            )
 
-        # Totales
-        data.append(["", "", "", "", "", "","", "", "",])
-        data.append(["", "", "", "", "", "","", "Inversión total", f"${total_inversion:,.2f}"])
-        data.append(["", "", "", "", "", "","", "Inversión extra", f"${total_sin_stock:,.2f}"])
-        data.append(["", "", "", "", "", "","", "Ganancias esperadas", f"${total_rentabilidad:,.2f}"])
-        
+            elements.append(Paragraph(f"Productos a comprar al proveedor: {proveedor}", title_style))
+            elements.append(Spacer(1, 10))
 
-        # Crear y agregar la tabla al PDF
-        table = Table(data, colWidths=[1*inch, 2*inch, 1.2*inch, 1*inch, 1*inch, 1*inch, 1*inch, 1.5*inch, 1.5*inch])
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-        ]))
+            # Encabezado de la tabla
+            data = [
+                ["Código", "Descripción", "Solicitado", "Disponible", "Diferencia", "Estado", "Costo Unitario", "Costo Total", "Precio Venta Unitario", "Total Pedido", "Ganancias Estimadas", "Inversión Faltante"]
+            ]
 
-        elements.append(table)
-        elements.append(Paragraph("<br/>", styles['Normal']))
+            total_inversion = 0
+            total_sin_stock = 0
+            total_rentabilidad = 0
 
-    # Construir el PDF
-    doc.build(elements)
-    pdf = buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
+            # Datos de cada producto
+            for item in items:
+                data.append([
+                    item["Código"],
+                    item["Nombre"],
+                    f"{item['Solicitado']} {item['Unidad de Medida']}",
+                    item["Disponible"],
+                    item["Diferencia"],
+                    item["Estado stock"],
+                    f"${item['Último Costo']:,.2f}",
+                    f"${item['Costo Total']:,.2f}",
+                    f"${item['Precio Venta Unitario']:,.2f}",
+                    f"${item['Total Pedido']:,.2f}",
+                    f"${item['Ganancias Estimadas']:,.2f}",
+                    f"${item['Inversión Faltante']:,.2f}"
+                ])
+                # Acumulación de totales
+                total_inversion += item["Costo Total"]
+                total_sin_stock += item["Inversión Faltante"]
+                total_rentabilidad += item["Ganancias Estimadas"]
+
+            # Configuración de la tabla
+            table = Table(data, colWidths=[0.7*inch, 1.5*inch, 0.9*inch, 0.9*inch, 0.9*inch, 1.0*inch, 1.0*inch, 1.1*inch, 1.2*inch, 1.2*inch, 1.5*inch, 1.2*inch])
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige)
+            ]))
+
+            # Añadir la tabla y totales
+            elements.append(table)
+            elements.append(Spacer(1, 12))
+            
+            # Agregar los totales como cuadros independientes
+            total_texts = [
+                f"Inversión total: ${total_inversion:,.2f}",
+                f"Inversión extra: ${total_sin_stock:,.2f}",
+                f"Ganancias esperadas: ${total_rentabilidad:,.2f}"
+            ]
+            
+            for total in total_texts:
+                elements.append(Paragraph(total, styles['Normal']))
+            
+            # Crear el PDF en el buffer
+            doc.build(elements)
+            pdf_buffer.seek(0)
+
+            # Guardar el PDF en el archivo ZIP
+            pdf_filename = f"{proveedor}.pdf"
+            zip_file.writestr(pdf_filename, pdf_buffer.read())
+
+    # Preparar la respuesta como archivo ZIP
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="reportes_proveedores.zip"'
+    
     return response
-

@@ -430,9 +430,13 @@
         <ul id="orderItemsList"></ul>
         <p id="orderTotal"></p>
 
-        <!-- Nuevo: Sección para seleccionar la dirección -->
+        <!-- Selección de dirección de entrega -->
         <h4>Selecciona una dirección de entrega:</h4>
         <div id="addressesList"></div>
+
+        <!-- Nueva sección: Selección del depósito -->
+        <h4>Selecciona un punto de retiro:</h4>
+        <div id="depositsList"></div> <!-- Aquí se mostrarán las opciones de depósito -->
 
         <div class="modal-actions">
             {% include 'button_order.html' %}
@@ -442,9 +446,9 @@
 
 
 
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-    // Variables de los modales
+document.addEventListener('DOMContentLoaded', () => {
     const modals = {
         confirmOrder: document.getElementById('confirmOrderModal'),
         editQuantity: document.getElementById('editQuantityModal'),
@@ -467,13 +471,14 @@
 
     let itemToDelete = null;
 
-    // Función para mostrar los productos en el modal de confirmación de pedido
+    // Renderizar productos en el modal de confirmación
     function renderOrderItems(items) {
         elements.orderItemsList.innerHTML = items.map(item =>
             `<li>${item.cantidad} x ${item.producto} - $${item.subtotal.toFixed(2)}</li>`
         ).join('');
     }
 
+    // Renderizar direcciones en el modal de confirmación
     function renderAddresses(direcciones) {
         const addressesList = document.getElementById('addressesList');
         if (direcciones.length > 0) {
@@ -488,9 +493,22 @@
         }
     }
 
+    // Renderizar depósitos en el modal de confirmación
+    function renderDeposits(depositos) {
+        const depositsList = document.getElementById('depositsList');
+        if (depositos.length > 0) {
+            depositsList.innerHTML = depositos.map(deposito =>
+                `<div>
+                    <input type="radio" name="deposito" value="${deposito.id}" required>
+                    <label>${deposito.nombre}</label>
+                </div>`
+            ).join('');
+        } else {
+            depositsList.innerHTML = '<p>No hay puntos de retiro disponibles.</p>';
+        }
+    }
 
-
-    // Evento al hacer clic en "Realizar Pedido"
+    // Cargar datos en el modal de confirmación de pedido
     elements.confirmOrderButton.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
@@ -499,26 +517,35 @@
                 headers: { 'X-CSRFToken': getCsrfToken() },
             });
 
+            if (!response.ok) throw new Error("Error al cargar el pedido.");
+
             const data = await response.json();
             if (data.items) {
                 renderOrderItems(data.items);
                 elements.orderTotal.textContent = `Total: $${data.total.toFixed(2)}`;
                 renderAddresses(data.direcciones);
+                renderDeposits(data.depositos);  // Renderizar los depósitos
                 modals.confirmOrder.classList.add('show');  // Abrir el modal
             } else {
                 console.error('Error al cargar el pedido');
             }
-
         } catch (error) {
             console.error('Error al cargar el pedido:', error);
         }
     });
 
-        // Confirmación del pedido (POST request)
+    // Confirmación del pedido (POST request)
     elements.confirmOrder.addEventListener('click', async () => {
         const selectedAddress = document.querySelector('input[name="direccion"]:checked');
+        const selectedDeposit = document.querySelector('input[name="deposito"]:checked');
+
         if (!selectedAddress) {
             alert('Por favor, selecciona una dirección de entrega.');
+            return;
+        }
+
+        if (!selectedDeposit) {
+            alert('Por favor, selecciona un punto de retiro.');
             return;
         }
 
@@ -529,29 +556,19 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCsrfToken(),
                 },
-                body: JSON.stringify({ direccion_id: selectedAddress.value }),
+                body: JSON.stringify({
+                    direccion_id: selectedAddress.value,
+                    deposito_id: selectedDeposit.value
+                }),
             });
+
+            if (!response.ok) throw new Error("Error al confirmar el pedido.");
 
             const data = await response.json();
             if (data.success) {
-                
-                // Cerrar el modal y mostrar animación si corresponde
                 modals.confirmOrder.classList.remove('show');
-
-                // Iniciar animación del botón (si aplica)
-                const button = document.querySelector('.order');
-                if (button && !button.classList.contains('animate')) {
-                    button.classList.add('animate');
-                    setTimeout(() => {
-                        button.classList.remove('animate');
-                        alert('Pedido confirmado. ¡Gracias por tu compra!');
-                        location.reload();  // Recargar para reflejar el nuevo estado
-                    }, 1000);  // Ajusta el tiempo según la duración de tu animación
-                } else {
-                    alert('Pedido confirmado. ¡Gracias por tu compra!');
-                    location.reload();
-                }
-                location.reload();
+                alert('Pedido confirmado. ¡Gracias por tu compra!');
+                location.reload();  // Recargar para reflejar el nuevo estado
             } else {
                 console.error(data.error || 'Error al confirmar el pedido');
             }
@@ -559,45 +576,6 @@
             console.error('Error al confirmar el pedido:', error);
         }
     });
-
-    elements.cancelOrder.addEventListener('click', () => modals.confirmOrder.classList.remove('show'));
-
-    // Funciones para edición de cantidad
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            elements.modalItemId.value = button.dataset.itemId;
-            elements.modalQuantityInput.value = button.dataset.currentQuantity;
-            modals.editQuantity.classList.add('show');
-        });
-    });
-
-    elements.increaseQuantity.addEventListener('click', () => {
-        elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) + 1;
-    });
-
-    elements.decreaseQuantity.addEventListener('click', () => {
-        if (elements.modalQuantityInput.value > 1) {
-            elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) - 1;
-        }
-    });
-
-    // Funciones para confirmación de eliminación
-    document.querySelectorAll('.remove-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            itemToDelete = button.closest('form').querySelector('input[name="item_id"]').value;
-            modals.deleteConfirmation.classList.add('show');
-        });
-    });
-
-    elements.confirmDelete.addEventListener('click', () => {
-        if (itemToDelete) {
-            const form = document.querySelector(`input[value="${itemToDelete}"]`).closest('form');
-            form.submit();
-        }
-    });
-
-    elements.cancelDelete.addEventListener('click', () => modals.deleteConfirmation.classList.remove('show'));
 
     // Obtener token CSRF
     function getCsrfToken() {

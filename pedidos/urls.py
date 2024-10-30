@@ -10,7 +10,7 @@ urlpatterns = [
     path('confirmar-pedido/<int:id>/', confirmar_pedido, name='confirmar-pedido'),
     path('confirmar-armado-pedido/<int:id>/', confirmar_armado_pedido, name='confirmar-armado-pedido'),
     path('iniciar-entrega-pedido/<int:id>/', iniciar_armado_pedido, name='iniciar-entrega-pedido'),
-    path('finalizar-entrega-pedido/<int:id>/', finalizar_armado_pedido, name='finalizar-entrega-pedido'),
+    path('finalizar-entrega-pedido/<int:id>/', finalizar_entrega_pedido, name='finalizar-entrega-pedido'),
 ]
 
 

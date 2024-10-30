@@ -92,7 +92,7 @@ class Chofer(models.Model):
 # cliente.pedidos_finalizados()    ---> Devuelve la cantidad de pedidos finalizados
 # cliente.pedidos_pendientes()    ---> Devuelve la cantidad de pedidos pendientes
 class Cliente(models.Model):
-    usuario = models.ForeignKey(User,on_delete=models.CASCADE,blank=False,null=False)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     codigo = models.CharField(verbose_name="documento",unique=True,max_length=200, null=True, blank=False)
     nombre_apellido = models.CharField(max_length=200, null=True, blank=False)
     telefono = models.CharField(max_length=20,default=1,blank=True,null=True)

@@ -15,7 +15,7 @@ class ConfiguracionAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request, obj=None):
         # Disables the ability to add new records directly in the admin
-        return False
+        return True
 
     def has_change_permission(self, request, obj=None):
         # Disables the ability to change existing records directly in the admin
@@ -23,7 +23,7 @@ class ConfiguracionAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # Allows the ability to delete records in the admin
-        return False
+        return True
 
 # -----------------------------------------------------------------------------
 # Vista TipoCliente

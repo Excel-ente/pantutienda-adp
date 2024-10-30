@@ -34,7 +34,7 @@ class Deposito(models.Model): # ok
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
     imagen = models.ImageField(
-        upload_to='img/',
+        upload_to='img/landing/',
         blank=True,
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif']), validate_image_size]
@@ -385,8 +385,27 @@ class ProductoPrecio(models.Model):
             # Lógica de cálculo basada en otro método de rentabilidad
 
             precio_venta = float(costo_unitario) / (100 - float(self.rentabilidad)) * 100
+            
         return float(precio_venta) * float(self.cantidad)
 
+    def precio_unitario_madre(self):
+        costo_unitario = float(self.precio_unitario_calculado()) / float(self.cantidad)
+        if self.unidad_de_medida != self.producto.unidad_de_medida:
+            if self.unidad_de_medida == "Kilos" or self.unidad_de_medida == "Litros":
+                costo_unitario = float(costo_unitario) / 1000
+            elif self.unidad_de_medida == "Gramos" or self.unidad_de_medida == "Mililitros":
+                costo_unitario = float(costo_unitario) * 1000
+            elif self.unidad_de_medida == "Mts":
+                costo_unitario = float(costo_unitario) / 100
+            elif self.unidad_de_medida == "Cms":
+                costo_unitario = float(costo_unitario) * 100 
+            elif self.unidad_de_medida == "Onzas":
+                costo_unitario = float(costo_unitario) * 16
+            elif self.unidad_de_medida == "Libras":
+                costo_unitario = float(costo_unitario) / 16  
+
+        return round(costo_unitario,2)
+    
     def save(self, *args, **kwargs):
         # Calcula el precio unitario y total antes de guardar
         self.precio_unitario = self.precio_unitario_calculado()

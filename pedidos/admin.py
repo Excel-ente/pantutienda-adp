@@ -10,11 +10,14 @@ from django.utils.html import format_html
 class ItemPedidoInline(admin.StackedInline):
     model = ItemPedido
     extra = 1  # Muestra un ítem vacío adicional por defecto
-    fields = ('producto_precio','cantidad','Precio_Unitario','Subtotal','disponibilidad')
-    readonly_fields =('Precio_Unitario','Subtotal','disponibilidad')
+    fields = ('producto_precio','cantidad','Cantidad_solicitada','Precio_Unitario','Subtotal','disponibilidad')
+    readonly_fields =('Cantidad_solicitada','Precio_Unitario','Subtotal','disponibilidad')
 
     def disponibilidad(self,obj):
         return f'{obj.consutlar_stock()}'
+
+    def Cantidad_solicitada(self,obj):
+        return  f'{obj.cantidad_madre():,.2f} {obj.producto.unidad_de_medida}'
 
     def Precio_Unitario(self,obj):
         return  f'{obj.precio_unitario:,.2f}'

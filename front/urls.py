@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import *
 from django.contrib.auth.views import LoginView
+from configuracion.views import onboarding
 
 urlpatterns = [
     path('home/', home, name='home'),
@@ -12,6 +13,8 @@ urlpatterns = [
     path('pedidos/', pedidos_view, name='pedidos_view'), 
     path('confirmar-pedido/', confirmar_pedido, name='confirmar_pedido_view'),
     path('cambiar-clave/', change_password, name='change_password'),
+    path('onboarding/', onboarding, name='onboarding'),
+    path('landing/', landing, name='landing'),
 ]
 
 

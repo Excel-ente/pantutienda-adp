@@ -3,7 +3,7 @@ from django.core.management import call_command
 from django.contrib.auth import get_user_model
 from configuracion.models import configuracion, Monedas, medioDeCompra, medioDeVenta
 from contabilidad.models import Cuentas
-from inventario.models import ListaDePrecio
+from inventario.models import Deposito, ListaDePrecio
 
 class Command(BaseCommand):
     help = 'Configura el proyecto inicializando la base de datos y creando un superusuario.'
@@ -36,6 +36,15 @@ class Command(BaseCommand):
         else:
             moneda_efectivo = Monedas.objects.get(id=1)
 
+        # Crear deposito general
+        if not Deposito.objects.filter(id=1).exists():
+            deposito = Deposito.objects.create(
+                nombre='Deposito Central',
+                direccion='Sin Dirección asignada',
+            )
+        else:
+            deposito = Deposito.objects.get(id=1)
+
         # Crear configuración inicial usando la instancia de Monedas
         self.stdout.write(self.style.SUCCESS('Verificando configuración inicial...'))
         if not configuracion.objects.filter(id=1).exists():
@@ -43,6 +52,7 @@ class Command(BaseCommand):
                 emprendimiento='EXCEL-ENTE',
                 Moneda=moneda_efectivo,  # Utiliza la instancia de Monedas
                 Moneda_secundaria=moneda_efectivo,
+                deposito_central=deposito,
             )
             self.stdout.write(self.style.SUCCESS('Configuración inicial creada.'))
         else:

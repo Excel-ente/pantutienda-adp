@@ -18,7 +18,7 @@ def almacenar_estado_anterior(sender, instance, **kwargs):
 def enviar_correo_confirmacion(sender, instance, created, **kwargs):
     # Solo envía el correo cuando el pedido cambia de 'abierto' a 'pendiente'
     if instance._estado_anterior == 'abierto' and instance.estado == 'pendiente':
-        send_mail_nuevo_pedido(instance)
+        pass#send_mail_nuevo_pedido(instance)
 
     elif instance._estado_anterior == 'pendiente' and instance.estado == 'en_preparacion':    
-        send_mail_pedido_confirmado(instance)
+        pass#send_mail_pedido_confirmado(instance)

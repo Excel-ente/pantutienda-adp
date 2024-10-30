@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración Inicial - Pantutienda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #F8B195;
+            --secondary-color: #F67280;
+            --accent-color: #C06C84;
+            --text-color: #355C7D;
+            --background-color: #FAFAFA;
+            --card-bg: #FFFFFF;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        h1, h2 {
+            color: var(--accent-color);
+        }
+        form {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--primary-color);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-content {
+            display: none;
+            margin-top: 1rem;
+        }
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            margin-top: 0.25rem;
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+
+
+        /* Estilos para la superposición de carga */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            border: 5px solid var(--secondary-color);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- Pantalla de carga -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <header>
+        <h1>Bienvenido a Pantutuenda</h1>
+        <p>Configuremos tu emprendimiento para comenzar</p>
+    </header>
+
+    <div class="container">
+        <form id="onboardingForm" action="{% url 'onboarding' %}" method="POST">
+            {% csrf_token %}
+            
+            <!-- Datos de la Empresa -->
+            <div class="form-section">
+                <h2>Datos de la Empresa</h2>
+                <div class="form-group">
+                    {{ form.emprendimiento.label_tag }}
+                    {{ form.emprendimiento }}
+                </div>
+            </div>
+
+            <!-- Configuración Monetaria -->
+           <div class="form-section">
+                <h2>Configuración Monetaria</h2>
+                <div class="form-group">
+                    {{ form.Moneda.label_tag }}
+                    {{ form.Moneda }}
+                </div>
+                <button type="button" class="toggle-btn" onclick="toggleContent('monedaSecundaria')">Usar más de 1 moneda</button>
+                <div id="monedaSecundaria" class="toggle-content">
+                    <div class="form-group">
+                        {{ form.Moneda_secundaria.label_tag }}
+                        {{ form.Moneda_secundaria }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.tipo_cambio_1.label_tag }}
+                        {{ form.tipo_cambio_1 }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Ventas y Costos -->
+            <div class="form-section">
+                <h2>Cálculo del Costo</h2>
+                <p>Elige cómo deseas calcular el precio de venta de tus productos:</p>
+        
+                <!-- Selección del método de cálculo del precio -->
+                <div class="form-group">
+                    <label for="calculo_costo">Método de Cálculo:</label>
+                    <select id="calculo_costo" name="calculo_costo" required>
+                        <option value="sobre_costo">Sobre el Costo (Rentabilidad)</option>
+                        <option value="sobre_precio">Sobre el Precio de Venta (Margen de Utilidad)</option>
+                    </select>
+                </div>
+        
+                <!-- Botón de "Más Información" para mostrar/ocultar sección de detalles -->
+                <button type="button" class="toggle-btn" onclick="toggleContent('info-section')">Más Información</button>
+        
+                <!-- Sección de información plegable -->
+                <div id="info-section" class="toggle-content">
+                    <!-- Sección Rentabilidad -->
+                    <div class="form-group">
+                        <h3>Rentabilidad (Cálculo sobre el Costo)</h3>
+                        <p>
+                            Este cálculo aplica el <strong>porcentaje de ganancia directamente sobre el costo</strong> del producto. Al aplicar un porcentaje de rentabilidad, el costo se incrementa en ese porcentaje para obtener el precio de venta.
+                        </p>
+                        <ul>
+                            <li><strong>Ejemplo:</strong> Si el costo es 100 y deseas una rentabilidad del 30%, el precio de venta será 130.</li>
+                            <li>Fórmula: <code>Precio de Venta = Costo + (Costo * Rentabilidad)</code></li>
+                        </ul>
+                        <p>Este método permite márgenes superiores al 100% del costo base.</p>
+                    </div>
+        
+                    <!-- Sección Margen de Utilidad -->
+                    <div class="form-group">
+                        <h3>Margen de Utilidad (Cálculo sobre el Precio de Venta)</h3>
+                        <p>
+                            Este cálculo considera el <strong>margen como un porcentaje del precio de venta final</strong>. El costo se divide por el porcentaje deseado para alcanzar el precio de venta con el margen de utilidad necesario.
+                        </p>
+                        <ul>
+                            <li><strong>Ejemplo:</strong> Si el costo es 100 y deseas un margen de utilidad del 30%, el precio de venta será aproximadamente 142.86.</li>
+                            <li>Fórmula: <code>Precio de Venta = Costo / (1 - Margen)</code></li>
+                        </ul>
+                        <p>Este método no permite <strong>márgenes que superen el 100%</strong>.</p>
+                    </div>
+
+                    <!-- Input para el costo y porcentaje de rentabilidad o margen -->
+                    <div class="form-group">
+                        <label for="costo">Costo del Producto:</label>
+                        <input type="number" id="costo" name="costo" placeholder="Ej. 100" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="porcentaje_costo">Porcentaje:</label>
+                        <input type="number" id="porcentaje_costo" name="porcentaje_costo" placeholder="Ej. 30" min="0" required>
+                        <p class="help-text">Introduce el porcentaje para calcular el precio de venta.</p>
+                    </div>
+
+                    <!-- Resultado calculado -->
+                    <div class="form-group">
+                        <label for="precio_venta">Precio de Venta Calculado:</label>
+                        <input type="number" id="precio_venta" name="precio_venta" readonly>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Configuración de Inventario -->
+            <div class="form-section">
+                <h2>Configuración de Inventario</h2>
+                <div class="form-group">
+                    {{ form.deposito_central.label_tag }}
+                    {{ form.deposito_central }}
+                </div>
+                <div class="form-group">
+                    {{ form.venta_stock_negativo }}
+                    {{ form.venta_stock_negativo.label_tag }}
+                    <p class="help-text">Si está marcado, se permitirá vender sin límites de inventario (genera stock negativo).</p>
+                </div>
+                <div class="form-group">
+                    {{ form.valuar_stock_negativo }}
+                    {{ form.valuar_stock_negativo.label_tag }}
+                    <p class="help-text">Si está marcado, el stock negativo restará de su valuación.</p>
+                </div>
+            </div>
+
+
+
+
+            <!-- Configuración de Precios -->
+            <div class="form-section">
+                <h2>Configuración de Precios</h2>
+                <div class="form-group">
+                    {{ form.precio_venta_automatico }}
+                    {{ form.precio_venta_automatico.label_tag }}
+                    <p class="help-text">Si está marcado, el precio de venta se calculará automáticamente basado en la rentabilidad sobre el costo.</p>
+                </div>
+                <div class="form-group">
+                    {{ form.unidad_de_medida_precio_venta }}
+                    {{ form.unidad_de_medida_precio_venta.label_tag }}
+                </div>
+            </div>
+
+
+
+            <!-- Configuración de Compras -->
+            <div class="form-section">
+                <h2>Configuración de Compras</h2>
+                <div class="form-group">
+                    {{ form.confirmar_viaje_compra }}
+                    {{ form.confirmar_viaje_compra.label_tag }}
+                    <p class="help-text">Permite confirmar cuando la compra llega al depósito de ingreso.</p>
+                </div>
+                <div class="form-group">
+                    {{ form.confirmar_descarga_compra }}
+                    {{ form.confirmar_descarga_compra.label_tag }}
+                    <p class="help-text">Permite confirmar cuando la mercadería se ingresó correctamente a inventario.</p>
+                </div>
+                <div class="form-group">
+                    {{ form.confirmar_pisar_costo }}
+                    {{ form.confirmar_pisar_costo.label_tag }}
+                    <p class="help-text">Actualiza el costo unitario de forma automática según la última compra.</p>
+                </div>
+                <div class="form-group">
+                    {{ form.editar_fecha_compra }}
+                    {{ form.editar_fecha_compra.label_tag }}
+                </div>
+            </div>
+
+            <!-- Configuración de Pedidos -->
+            <div class="form-section">
+                <h2>Configuración de Pedidos</h2>
+                <div class="form-group">
+                    {{ form.limite_pedidos_pendientes.label_tag }}
+                    {{ form.limite_pedidos_pendientes }}
+                </div>
+                <div class="form-group">
+                    {{ form.mail_bienvenida_cliente }}
+                    {{ form.mail_bienvenida_cliente.label_tag }}
+                </div>
+                <div class="form-group">
+                    {{ form.mail_bienvenida_proveedor }}
+                    {{ form.mail_bienvenida_proveedor.label_tag }}
+                </div>
+                <div class="form-group">
+                    {{ form.gestionar_armar_pedido }}
+                    {{ form.gestionar_armar_pedido.label_tag }}
+                </div>
+                <div class="form-group">
+                    {{ form.gestionar_entrega }}
+                    {{ form.gestionar_entrega.label_tag }}
+                    <p class="help-text">Incluye gestión de fletes y entregas.</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Guardar Configuración</button>
+        </form>
+
+        
+    </div>
+
+
+    <script>
+        document.getElementById('onboardingForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Previene el envío inmediato del formulario
+    
+            // Muestra la pantalla de carga
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+    
+            // Espera 3 segundos y luego redirige
+            setTimeout(function() {
+                window.location.href = '/app/';
+            }, 3000);
+    
+            // Si el formulario es válido, envíalo (remover preventDefault temporalmente)
+            setTimeout(() => event.target.submit(), 3000);
+        });
+    </script>
+    
+
+    
+    <script>
+        // Función para alternar visibilidad de contenido
+        function toggleContent(id) {
+            const content = document.getElementById(id);
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Función para calcular el precio de venta
+        document.getElementById('porcentaje_costo').addEventListener('input', calculatePrice);
+        document.getElementById('costo').addEventListener('input', calculatePrice);
+        document.getElementById('calculo_costo').addEventListener('change', calculatePrice);
+
+        function calculatePrice() {
+            const costo = parseFloat(document.getElementById('costo').value) || 0;
+            const porcentaje = parseFloat(document.getElementById('porcentaje_costo').value) || 0;
+            const metodo = document.getElementById('calculo_costo').value;
+            let precioVenta;
+
+            if (metodo === 'sobre_costo') {
+                // Cálculo sobre el costo (Rentabilidad)
+                precioVenta = costo + (costo * (porcentaje / 100));
+            } else {
+                // Cálculo sobre el precio de venta (Margen de Utilidad)
+                if (porcentaje >= 100) {
+                    alert("El porcentaje de margen de utilidad debe ser menor a 100%");
+                    return;
+                }
+                precioVenta = costo / (1 - (porcentaje / 100));
+            }
+
+            // Muestra el resultado en el campo de precio de venta
+            document.getElementById('precio_venta').value = precioVenta.toFixed(2);
+        }
+
+        // Inicializa la sección como plegada al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('info-section').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

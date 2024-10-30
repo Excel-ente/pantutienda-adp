@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantutuenda - Tu Solución Integral para Gestión de Inventario y Ventas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2691E;
+            --accent-color: #DEB887;
+            --text-color: #4A4A4A;
+            --background-color: #FFF8DC;
+            --card-bg: #FFFFFF;
+        }
+        .dark-mode {
+            --primary-color: #D2691E;
+            --secondary-color: #8B4513;
+            --accent-color: #CD853F;
+            --text-color: #E0E0E0;
+            --background-color: #2C2C2C;
+            --card-bg: #3C3C3C;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        section {
+            padding: 100px 0;
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        .hero {
+            background: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-color);
+        }
+        .btn:hover {
+            background-color: transparent;
+            color: var(--accent-color);
+        }
+        .features, .how-it-works, .testimonials {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            flex: 1 1 calc(33.333% - 20px);
+            min-width: 250px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        .card i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .how-it-works .card {
+            position: relative;
+            overflow: hidden;
+        }
+        .how-it-works .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        .testimonial {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .testimonial img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .cta {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 80px 0;
+            margin-top: 50px;
+        }
+        .cta h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+        }
+        @media (max-width: 768px) {
+            .card {
+                flex: 1 1 100%;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <ul>
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#caracteristicas">Características</a></li>
+                <li><a href="#como-funciona">Cómo Funciona</a></li>
+                <li><a href="#testimonios">Testimonios</a></li>
+            </ul>
+            <button class="theme-toggle" aria-label="Cambiar tema">
+                <i data-feather="sun"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="inicio" class="hero">
+            <div class="container hero-content">
+                <h1>Bienvenido a Pantutuenda</h1>
+                <p>Tu solución integral para gestión de inventario, ventas y mucho más</p>
+                <a href="#caracteristicas" class="btn">Descubre nuestras funcionalidades</a>
+            </div>
+        </section>
+
+        <section id="caracteristicas">
+            <div class="container">
+                <h2>Características Principales</h2>
+                <div class="features">
+                    <div class="card">
+                        <i data-feather="tag"></i>
+                        <h3>Listas de Precios Personalizadas</h3>
+                        <p>Gestiona diferentes listas de precios para cada cliente y producto, con opciones por unidad, caja o presentaciones personalizadas.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="file-text"></i>
+                        <h3>Reportes Avanzados</h3>
+                        <p>Genera informes detallados de pedidos pendientes, inversión necesaria, costos y ganancias estimadas en formato PDF.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="layout"></i>
+                        <h3>Página Inicial Personalizable</h3>
+                        <p>Crea y personaliza fácilmente tu página de inicio con secciones HTML configurables, imágenes y textos.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="package"></i>
+                        <h3>Gestión de Productos Avanzada</h3>
+                        <p>Crea productos simples, compuestos (recetas) y promociones. Gestiona múltiples inventarios eficientemente.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="users"></i>
+                        <h3>Gestión de Equipo</h3>
+                        <p>Administra vendedores para pedidos online y choferes para entregas, optimizando tu operación.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="bar-chart-2"></i>
+                        <h3>Análisis de Compras</h3>
+                        <p>Obtén insights detallados sobre los productos comprados, tendencias y variaciones de precios de proveedores.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="como-funciona">
+            <div class="container">
+                <h2>Cómo Funciona</h2>
+                <div class="how-it-works">
+                    <div class="card">
+                        <i data-feather="user-plus"></i>
+                        <h3>1. Configura tu Cuenta</h3>
+                        <p>Personaliza tu perfil, crea listas de precios y configura tus productos e inventarios.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="shopping-bag"></i>
+                        <h3>2. Gestiona tus Ventas</h3>
+                        <p>Procesa pedidos, gestiona inventarios y analiza el rendimiento de tus productos.</p>
+                    </div>
+                    <div class="card">
+                        <i data-feather="trending-up"></i>
+                        <h3>3. Optimiza tu Negocio</h3>
+                        <p>Utiliza nuestros reportes avanzados para tomar decisiones informadas y crecer tu negocio.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonios">
+            <div class="container">
+                <h2>Lo que dicen nuestros clientes</h2>
+                <div class="testimonials">
+                    <div class="testimonial">
+                        <div class="testimonial-header">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="María G.">
+                            <h3>María G.</h3>
+                        </div>
+                        <p>"Pantutuenda ha revolucionado la forma en que gestionamos nuestro inventario y ventas. Los reportes personalizados son increíblemente útiles."</p>
+                    </div>
+                    <div class="testimonial">
+                        <div class="testimonial-header">
+                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Carlos R.">
+                            <h3>Carlos R.</h3>
+                        </div>
+                        <p>"La flexibilidad para crear productos compuestos y promociones nos ha permitido optimizar nuestras ofertas y aumentar las ventas."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about-developer">
+            <div class="container">
+                <h2>Sobre el Desarrollador</h2>
+                <div class="card">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Desarrollador" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 20px;">
+                    <h3>Desarrollador Web y Educador</h3>
+                    <p>Con años de experiencia en desarrollo web y una pasión por la educación, he creado Pantutuenda para resolver problemas reales de gestión de negocios. Además, comparto conocimientos en mi canal de YouTube "excel-ente", donde enseño habilidades prácticas de programación y análisis de datos.</p>
+                    <a href="https://www.youtube.com/c/excel-ente" target="_blank" class="btn" style="margin-top: 20px;">Visita mi Canal de YouTube</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <h2>¿Listo para revolucionar tu negocio?</h2>
+                <p>Únete a Pantutuenda hoy y lleva tu gestión al siguiente nivel</p>
+                <a href="#" class="btn">Comienza Ahora - ¡Es Gratis!</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024  Pantutuenda. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        feather.replace();
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const themeToggle = document.querySelector('.theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.setAttribute('data-feather', 'moon');
+                } else {
+                    themeIcon.setAttribute('data-feather', 'sun');
+                }
+                feather.replace();
+            });
+
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Intersection Observer for fade-in animation
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card, .testimonial').forEach(el => {
+                el.style.opacity = "0";
+                el.style.transition = "opacity 0.5s ease-out, transform 0.5s ease-out";
+                observer.observe(el);
+            });
+
+            // Add fade-in class for animation
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    .fade-in {
+                        opacity: 1 !important;
+                        transform: translateY(0) !important;
+                    }
+                </style>
+            `);
+        });
+    </script>
+</body>
+</html>

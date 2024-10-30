@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from agenda.models import Proveedor
 
+
 # -----------------------------------------------------------------------------
 # Metodos para acceder a los valores de forma dinamica
 class Monedas(models.Model):
@@ -120,6 +121,7 @@ class configuracion(models.Model):
     tipo_cambio_1 = models.DecimalField(max_digits=25, decimal_places=10, default=1, blank=False, null=False)
     calculo_rentabilidad = models.CharField(max_length=50,choices=RENTABILIDAD,blank=False,null=False,default="Sobre costo")
     gastos_fletes_compras = models.CharField(max_length=50,choices=FLETES_COMPRAS_CHOICES,blank=False,null=False,default="Distribuir costo en productos",help_text='Si usted desea que el gasto del flete al hacer la compra se distribuya entre los productos comprados (Actualiza costo tomando el flete), Debe seleccionar "Distribuir costo en productos", en caso contrario el gasto del flete irá a la cuenta de GASTOS VARIOS.')
+    deposito_central = models.ForeignKey('inventario.Deposito',on_delete=models.PROTECT, blank=True,null=True)
     venta_stock_negativo = models.BooleanField(default=True,help_text='Si desea vender sin limites de inventario, deje esta casilla en True. (Genera Stock Negativo)')
     valuar_stock_negativo = models.BooleanField(default=False,help_text='Si desea que el stock negativo reste de su valuacion, deje esta casilla en True.')
     precio_venta_automatico = models.BooleanField(default=True,verbose_name='Precio venta basado en rentabilidad',help_text='Si desea que el precio de venta del producto se calcule en base a una rentabilidad sobre el costo, deje esta casilla en True. En el caso contrario, se habilitará una casilla para colocar el precio final de venta.')

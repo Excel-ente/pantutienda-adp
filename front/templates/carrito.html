@@ -49,7 +49,7 @@
     .cart-table td {
         vertical-align: middle;
     }
-    .product-image {
+    .product-image-cart {
         width: 50px;
         height: 50px;
         object-fit: cover;
@@ -64,8 +64,8 @@
         background-color: #db9201;
         color: white;
         border: none;
-        width: 25px;
-        height: 25px;
+        width: 15px;
+        height: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -88,7 +88,7 @@
         font-size: 1.25rem;
         font-weight: bold;
         color: #14171A;
-        margin-top: 1.5rem;
+        
     }
     .cart-actions {
         margin-top: 2rem;
@@ -180,6 +180,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-top: 10px;
+        width: 50%;
     }
 
     .quantity-btn {
@@ -253,20 +254,15 @@
         font-size: 18px;
     }
 
-    /* Alineación de botones en las acciones */
-    .action-btns {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-    }
 
 
 
     .modal-actions {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         gap: 10px;
         margin-top: 15px;
+        width: 100%;
     }
 
     .btn {
@@ -307,88 +303,174 @@
         color: #dc3545;
     }
 
-    /* Ajustar estilos en dispositivos móviles */
-    @media (max-width: 768px) {
-        /* Oculta los elementos decorativos en móviles */
-        .cart-container {
-            padding: 15px 0px;
-            margin: 0;
-            box-shadow: none;
-        }
-
-        .container {
-            gap: 5px; /* Reducir el espacio entre productos */
-        }
-
-        .product-card {
-            border-radius: 0;
-            box-shadow: none;
-        }
+    .contenedor-tabla {
+        justify-content: center;
     }
 
+    #confirmOrderModal > .modal-content{
+        align-items: flex-start;
+    }
+
+    #editQuantityModal> .modal-content {
+        width: 80%;
+    }
+
+    /* Estilos para pantallas grandes (mantiene la tabla con encabezados) */
+    @media (min-width: 768px) {
+      .cart-table {
+        display: table;
+      }
+
+
+    }
+    
+    /* Estilos para pantallas pequeñas (conversión a tarjetas sin encabezados) */
+    @media (max-width: 767px) {
+
+        .follow-button {
+            order: 2; /* Para que aparezca debajo en pantallas grandes */
+            padding-top: 20px;
+        }
+
+        .cart-table {
+          display: block;
+        }
+      
+        
+      
+        .cart-table tbody {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+      
+        .cart-table tr {
+          display: flex;
+          flex-direction: column;
+          padding: 1rem;
+          border-radius: 5px;
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+          margin-bottom: 0px;
+        }
+
+        .cart-container {
+            padding: 10px;
+            box-shadow: none;
+        }
+      
+        .cart-table td[data-label="Producto"]::before,
+        .cart-table td[data-label="Acciones"]::before {
+            content: none; /* Elimina los nombres de los campos */
+        }
+
+        
+
+
+
+       
+        .cart-table td {
+          padding: 0.5rem 0;
+        }
+      
+        /* Estilos específicos para que las imágenes se muestren correctamente */
+        .product-image-cart {
+          max-width: 80px; /* Ajusta el tamaño de la imagen según el diseño */
+          height: auto;
+          margin-right: 10px;
+          border-radius: 5px;
+        }
+      
+        /* Ajuste de la disposición para mostrar imagen y nombre en línea */
+        .cart-table td[data-label="Producto"] {
+          display: flex;
+          align-items: center;
+        }
+      }
 </style>
 
 <div class="container cart-container">
-    <h2 class="cart-title"><i class="fas fa-shopping-cart"></i>&nbsp; Carrito de Compras</h2>
-    <hr>
-    {% if items %}
-        <div class="table-responsive">
-            <table class="table cart-table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Subtotal</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                        <tr>
-                            <td data-label="Producto">
-                                <div class="d-flex align-items-center">
-                                    <img src="{% if item.producto.imagen %}{{ item.producto.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ item.producto.nombre }}" class="product-image mr-3">
-                                    <span>&nbsp; {{ item.producto.nombre }}</span>
-                                </div>
-                            </td>
-                            <td data-label="Cantidad">{{ item.cantidad|intcomma }}</td>
-                            <td data-label="Precio Unitario">${{ item.precio_unitario|intcomma }}</td>
-                            <td data-label="Subtotal">${{ item.subtotal|intcomma  }}</td>
-                            <td data-label="Acciones">
-                                <button class="edit-btn" data-item-id="{{ item.id }}" data-current-quantity="{{ item.cantidad }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form method="POST" action="{% url 'carrito' %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <button type="submit" class="remove-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+    <div class="row contenedor-tabla">
+        <div class="row">
+            <h2 class="cart-title"><i class="fas fa-shopping-cart"></i>&nbsp; Carrito de Compras</h2>
+            {% if items %}
+                <div class="table-responsive">
+                    <table class="table cart-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                                <tr>
+                                    <td data-label="Producto">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{% if item.producto.imagen %}{{ item.producto.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ item.producto.nombre }}" class="product-image-cart mr-3">
+                                            <span>&nbsp; {{ item.producto.nombre }}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Cantidad">{{ item.cantidad|intcomma }}</td>
+                                    <td data-label="Precio Unitario">${{ item.precio_unitario|intcomma }}</td>
+                                    <td data-label="Subtotal">${{ item.subtotal|intcomma  }}</td>
+                                    <td data-label="Acciones" class="justify-content-center">
+                                        <div class="row w-100">
+                                            <div class="col-6 p-1">
+                                                <button class="edit-btn w-100" data-item-id="{{ item.id }}" data-current-quantity="{{ item.cantidad }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-6 p-1">
+                                            <form method="POST" action="{% url 'carrito' %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                <button type="submit" class="remove-btn w-100">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+                    
+
+                </div>
                 
-            </table>
-        </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-9 mb-3 follow-button">
+                    <a href="{% url 'productos' %}" >
+                        <i class="fas fa-arrow-left mr-2"></i> Seguir Comprando
+                    </a>
+                </div>
 
-        <div class="cart-total">
-            Total: ${{ total }}
-        </div>
 
-        <div class="cart-actions">
-            <a href="{% url 'productos' %}" class="btn btn-outline-primary btn-continue">
-                <i class="fas fa-arrow-left mr-2"></i>Seguir Comprando
-            </a>
-            <a href="#" class="btn btn-primary btn-order" id="confirmOrderButton">
-                Realizar Pedido <i class="fas fa-arrow-right ml-2"></i>
-            </a>
+                <div class="col-12 col-md-3 text-md-right"> 
+                        
+                    <h4 class="cart-total pb-3">
+                        Total: ${{ total }}
+                    </h4>
+                        <a href="#" class="btn btn-primary btn-order mt-2" id="confirmOrderButton">
+                            Realizar Pedido
+                        </a>
+                    
+                    
+                </div>
+            </div>
+
+            
+
+        {% else %}
+            <p class="empty-cart">Tu carrito está vacío. <a href="{% url 'productos' %}">¡Empieza a comprar ahora!</a></p>
+        {% endif %}
         </div>
-    {% else %}
-        <p class="empty-cart">Tu carrito está vacío. <a href="{% url 'productos' %}">¡Empieza a comprar ahora!</a></p>
-    {% endif %}
 </div>
 
 <!-- Modal para Editar Cantidad -->
@@ -396,15 +478,19 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h3>Editar Cantidad</h3>
-        <form method="POST" action="{% url 'actualizar_carrito' %}">
+        <form method="POST" action="{% url 'actualizar_carrito' %}" class="align-items-center d-flex flex-column">
             {% csrf_token %}
             <input type="hidden" name="item_id" id="modalItemId">
-            <div class="quantity-container">
-                <button type="button" id="decreaseQuantity" class="quantity-btn">-</button>
-                <input type="number" name="quantity" id="modalQuantityInput" value="1" min="1" class="quantity-input">
-                <button type="button" id="increaseQuantity" class="quantity-btn">+</button>
+            <div class="quantity-container w-50 d-flex align-items-center">
+                <button type="button" id="decreaseQuantity" class="quantity-btn btn btn-outline-danger">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" name="quantity" id="modalQuantityInput" value="1" min="1" class="quantity-input text-center mx-2">
+                <button type="button" id="increaseQuantity" class="quantity-btn btn btn-outline-success">
+                    <i class="fas fa-plus"></i>
+                </button>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mt-3">Actualizar</button>
+            <button type="submit" class="btn btn-primary mt-3 w-50">Actualizar</button>
         </form>
     </div>
 </div>
@@ -416,39 +502,60 @@
         <h3>¿Eliminar artículo?</h3>
         <p>¿Estás seguro de que deseas eliminar este artículo del carrito?</p>
         <div class="modal-actions">
-            <button id="confirmDelete" class="btn btn-danger w-45">Eliminar</button>
             <button id="cancelDelete" class="btn btn-secondary w-45">Cancelar</button>
+            <button id="confirmDelete" class="btn btn-danger w-45">Eliminar</button>
+
         </div>
     </div>
 </div>
 
 <!-- Modal de Confirmación de Pedido -->
+<!-- Modal de Confirmación de Pedido -->
 <div id="confirmOrderModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3>Confirmar Pedido</h3>
-        <ul id="orderItemsList"></ul>
-        <p id="orderTotal"></p>
+        <span class="close" title="Cerrar">&times;</span>
+        <h3 class="align-self-center">Confirmar Pedido</h3>
+        <p>Por favor revisa los detalles de tu pedido:</p>
+        <ul id="orderItemsList" class="list-group w-100">
+            
+        </ul>
+        <ul id="orderItemsList" class="list-group pt-2 w-100">
+            <li class="list-group-item list-group-item-success text-center" id="orderTotal"></li>
 
-        <!-- Selección de dirección de entrega -->
-        <h4>Selecciona una dirección de entrega:</h4>
-        <div id="addressesList"></div>
+        </ul>
+        
 
-        <!-- Nueva sección: Selección del depósito -->
-        <h4>Selecciona un punto de retiro:</h4>
-        <div id="depositsList"></div> <!-- Aquí se mostrarán las opciones de depósito -->
+        <!-- Nuevo: Sección para seleccionar la dirección -->
+        <p class="pt-2">Selecciona una dirección de entrega:</p>
+
+        
+        <ul id="addressesList" class="list-group w-100"></ul>
+        <div class="alert alert-danger mt-3 mb-0 w-100 d-none" id="alerta-direccion" role="alert">
+            Por favor, selecciona una dirección
+        </div>
 
         <div class="modal-actions">
-            {% include 'button_order.html' %}
+            <button id="cancelOrder" class="btn btn-secondary w-45">Cancelar</button>
+            <button id="confirmOrder" class="btn btn-success w-45">Confirmar Pedido</button>
         </div>
     </div>
 </div>
 
 
-
+<div class="toast-container position-fixed bottom-0 end-0 p-3 ">
+    <div id="pedidoConfirmadoToast" class="toast align-items-center text-white bg-success border-0 d-none" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Pedido confirmado. ¡Gracias por tu compra!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+    // Variables de los modales
     const modals = {
         confirmOrder: document.getElementById('confirmOrderModal'),
         editQuantity: document.getElementById('editQuantityModal'),
@@ -471,44 +578,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let itemToDelete = null;
 
-    // Renderizar productos en el modal de confirmación
-    function renderOrderItems(items) {
+    // Función para mostrar los productos en el modal de confirmación de pedido
+    function renderOrderItems(items, total) {
+
         elements.orderItemsList.innerHTML = items.map(item =>
-            `<li>${item.cantidad} x ${item.producto} - $${item.subtotal.toFixed(2)}</li>`
+            `<li class="list-group-item text-start">${item.cantidad} x ${item.producto} - $${item.subtotal.toFixed(2)}</li>`
         ).join('');
+
+        elements.orderTotal.textContent = total
     }
 
-    // Renderizar direcciones en el modal de confirmación
     function renderAddresses(direcciones) {
         const addressesList = document.getElementById('addressesList');
         if (direcciones.length > 0) {
             addressesList.innerHTML = direcciones.map(direccion =>
-                `<div>
+            
+                `<li class="list-group-item w-100 text-start">
                     <input type="radio" name="direccion" value="${direccion.id}" required>
                     <label>${direccion.direccion}</label>
-                </div>`
+                </li>`
             ).join('');
         } else {
             addressesList.innerHTML = '<p>No tienes direcciones registradas.</p>';
         }
     }
 
-    // Renderizar depósitos en el modal de confirmación
-    function renderDeposits(depositos) {
-        const depositsList = document.getElementById('depositsList');
-        if (depositos.length > 0) {
-            depositsList.innerHTML = depositos.map(deposito =>
-                `<div>
-                    <input type="radio" name="deposito" value="${deposito.id}" required>
-                    <label>${deposito.nombre}</label>
-                </div>`
-            ).join('');
-        } else {
-            depositsList.innerHTML = '<p>No hay puntos de retiro disponibles.</p>';
-        }
-    }
 
-    // Cargar datos en el modal de confirmación de pedido
+
+    // Evento al hacer clic en "Realizar Pedido"
     elements.confirmOrderButton.addEventListener('click', async (e) => {
         e.preventDefault();
         try {
@@ -517,35 +614,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'X-CSRFToken': getCsrfToken() },
             });
 
-            if (!response.ok) throw new Error("Error al cargar el pedido.");
-
             const data = await response.json();
             if (data.items) {
-                renderOrderItems(data.items);
-                elements.orderTotal.textContent = `Total: $${data.total.toFixed(2)}`;
+                renderOrderItems(data.items, `Total: $${data.total.toFixed(2)}`);
                 renderAddresses(data.direcciones);
-                renderDeposits(data.depositos);  // Renderizar los depósitos
                 modals.confirmOrder.classList.add('show');  // Abrir el modal
             } else {
                 console.error('Error al cargar el pedido');
             }
+
         } catch (error) {
             console.error('Error al cargar el pedido:', error);
         }
     });
 
-    // Confirmación del pedido (POST request)
+        // Confirmación del pedido (POST request)
     elements.confirmOrder.addEventListener('click', async () => {
         const selectedAddress = document.querySelector('input[name="direccion"]:checked');
-        const selectedDeposit = document.querySelector('input[name="deposito"]:checked');
-
+        const alertaDireccion = document.querySelector('#alerta-direccion')
         if (!selectedAddress) {
-            alert('Por favor, selecciona una dirección de entrega.');
-            return;
-        }
-
-        if (!selectedDeposit) {
-            alert('Por favor, selecciona un punto de retiro.');
+            alertaDireccion.classList.remove('d-none');
             return;
         }
 
@@ -556,19 +644,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCsrfToken(),
                 },
-                body: JSON.stringify({
-                    direccion_id: selectedAddress.value,
-                    deposito_id: selectedDeposit.value
-                }),
+                body: JSON.stringify({ direccion_id: selectedAddress.value }),
             });
-
-            if (!response.ok) throw new Error("Error al confirmar el pedido.");
 
             const data = await response.json();
             if (data.success) {
+                
+                // Cerrar el modal y mostrar animación si corresponde
                 modals.confirmOrder.classList.remove('show');
-                alert('Pedido confirmado. ¡Gracias por tu compra!');
-                location.reload();  // Recargar para reflejar el nuevo estado
+
+                // Iniciar animación del botón (si aplica)
+                const button = document.querySelector('.order');
+                if (button && !button.classList.contains('animate')) {
+                    button.classList.add('animate');
+                    setTimeout(() => {
+                        button.classList.remove('animate');
+                        location.reload();  // Recargar para reflejar el nuevo estado
+                    }, 1000);  // Ajusta el tiempo según la duración de tu animación
+                } else {
+                    const toast = document.getElementById('pedidoConfirmadoToast')
+                    toast.classList.remove('d-none')
+                    location.reload();
+                }
+                location.reload();
             } else {
                 console.error(data.error || 'Error al confirmar el pedido');
             }
@@ -576,6 +674,45 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error al confirmar el pedido:', error);
         }
     });
+
+    elements.cancelOrder.addEventListener('click', () => modals.confirmOrder.classList.remove('show'));
+
+    // Funciones para edición de cantidad
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            elements.modalItemId.value = button.dataset.itemId;
+            elements.modalQuantityInput.value = button.dataset.currentQuantity;
+            modals.editQuantity.classList.add('show');
+        });
+    });
+
+    elements.increaseQuantity.addEventListener('click', () => {
+        elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) + 1;
+    });
+
+    elements.decreaseQuantity.addEventListener('click', () => {
+        if (elements.modalQuantityInput.value > 1) {
+            elements.modalQuantityInput.value = parseInt(elements.modalQuantityInput.value) - 1;
+        }
+    });
+
+    // Funciones para confirmación de eliminación
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            itemToDelete = button.closest('form').querySelector('input[name="item_id"]').value;
+            modals.deleteConfirmation.classList.add('show');
+        });
+    });
+
+    elements.confirmDelete.addEventListener('click', () => {
+        if (itemToDelete) {
+            const form = document.querySelector(`input[value="${itemToDelete}"]`).closest('form');
+            form.submit();
+        }
+    });
+
+    elements.cancelDelete.addEventListener('click', () => modals.deleteConfirmation.classList.remove('show'));
 
     // Obtener token CSRF
     function getCsrfToken() {

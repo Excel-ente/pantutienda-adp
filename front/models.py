@@ -89,6 +89,18 @@ class Landing(models.Model):
     newsletter_text = models.CharField(max_length=200, null=True, blank=False)
     newsletter_btn_label = models.CharField(max_length=200, null=True, blank=False)
 
+    section_clients = models.BooleanField(default=False)
+    clients_title = models.CharField(max_length=200, null=True, blank=False)
+    clients_text = models.CharField(max_length=500, null=True, blank=True)
+    clients_logo_1 = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    clients_logo_2 = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    clients_logo_3 = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    clients_logo_4 = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+
+    footer_section = models.BooleanField(default=False)
+    footer_text = models.CharField(max_length=200, null=True, blank=True)
+    footer_icon = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+
 
     class Meta:
         verbose_name = 'pagina'
@@ -104,7 +116,9 @@ class Section(models.Model):
         ('testimonials', 'Testimonials Section'),
         ('features', 'Features Section'),
         ('cta_section', 'Call to Action Section'),
-        ('newsletter', 'Newsletter Section')
+        ('newsletter', 'Newsletter Section'),
+        ('section_clients', 'Nuestros Clientes Section'),
+        ('footer', 'Footer Section'),
     ]
 
     name = models.CharField(max_length=255, choices=SECTION_CHOICES)
@@ -118,3 +132,16 @@ class Section(models.Model):
     class Meta:
         verbose_name = 'orden'
         verbose_name_plural ='🕌 Orden de Secciones'
+
+class CategoryOrder(models.Model):
+    landing = models.ForeignKey(Landing, on_delete=models.CASCADE, related_name="category_order_set")
+    category = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "orden de categoría"
+        verbose_name_plural = "Orden de Categorías"
+        ordering = ['order']  
+
+    def __str__(self):
+        return f"{self.category} - Orden: {self.order}"

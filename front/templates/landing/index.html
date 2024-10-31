@@ -28,6 +28,10 @@
             {% include "landing/section_cta_section.html" %}
         {% elif section.name == 'newsletter' %}
             {% include "landing/section_newsletter.html" %}
+            {% elif section.name == 'section_clients'%}
+            {% include "landing/section_clients.html" %}
+        {% elif section.name == 'footer'%}
+            {% include "landing/footer.html" %}
         {% endif %}
     {% endfor %}
 {% endblock %}

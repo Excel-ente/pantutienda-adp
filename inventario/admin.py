@@ -161,24 +161,24 @@ class MovimientoProductoInline(admin.TabularInline):
         return False  # Desactivar la capacidad de eliminar ventas desde el admin de Cliente
 
 # Vista Producto
-class ProductoResource(resources.ModelResource):
-    categoria = fields.Field(attribute='categoria__nombre', column_name='categoria', widget=widgets.ForeignKeyWidget(Categoria, 'nombre'))
-    primer_producto_precio = fields.Field(attribute='primer_producto_precio', column_name='primer_producto_precio')
-    stock_str = fields.Field(attribute='stock_str', column_name='stock_str')
-    valuacion_stock = fields.Field(attribute='valuacion_stock', column_name='valuacion_stock')
-    stock_str = fields.Field(attribute='stock_str', column_name='stock_str')
+# class ProductoResource(resources.ModelResource):
+#     categoria = fields.Field(attribute='categoria__nombre', column_name='categoria', widget=widgets.ForeignKeyWidget(Categoria, 'nombre'))
+#     primer_producto_precio = fields.Field(attribute='primer_producto_precio', column_name='primer_producto_precio')
+#     stock_str = fields.Field(attribute='stock_str', column_name='stock_str')
+#     valuacion_stock = fields.Field(attribute='valuacion_stock', column_name='valuacion_stock')
+#     stock_str = fields.Field(attribute='stock_str', column_name='stock_str')
 
-    class Meta:
-        model = Producto
+#     class Meta:
+#         model = Producto
  
-    def dehydrate_primer_producto_precio(self, producto):
-        return producto.primer_producto_precio.precio_total if producto.primer_producto_precio else "No Disponible"
+#     def dehydrate_primer_producto_precio(self, producto):
+#         return producto.primer_producto_precio.precio_total if producto.primer_producto_precio else "No Disponible"
 
-    def dehydrate_stock_str(self, producto):
-        return producto.stock_actual_str
+#     def dehydrate_stock_str(self, producto):
+#         return producto.stock_actual_str
 
-    def dehydrate_valuacion_stock(self, producto):
-        return f'{producto.valuacion_stock:,.2f}'
+#     def dehydrate_valuacion_stock(self, producto):
+#         return f'{producto.valuacion_stock:,.2f}'
 
 
 def habilitar_productos_masivamente(modeladmin, request, queryset):
@@ -237,7 +237,7 @@ class StockFilter(SimpleListFilter):
 
 @admin.register(Producto)
 class ProductoAdmin(ImportExportModelAdmin):
-    resource_class = ProductoResource
+    #resource_class = ProductoResource
     list_display = ('mostrar_imagen','codigo','nombre','costo_ultimo_unitario','precio','en_inventario','publicado')
     list_display_links = ('mostrar_imagen','codigo','nombre','costo_ultimo_unitario','precio','en_inventario')
     readonly_fields = ['mostrar_imagen_form','proveedor','costo_ultimo_unitario','precio','stock_actual','deshabilitar',]

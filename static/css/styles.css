@@ -119,9 +119,13 @@ body {
 }
 
 .close {
-    float: right;
+    background: none;
+    border: none;
     font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
+    color: #aaa;
+    align-self: end;
 }
 
 .profile-header {

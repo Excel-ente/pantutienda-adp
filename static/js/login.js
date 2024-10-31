@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerModal = document.getElementById('registerModal');
     const closeButtons = document.querySelectorAll('.modal .close');
     const openRegisterModal = document.getElementById('openRegisterModal');
+    const openLoginModal = document.getElementById('openLoginModal');
 
     openRegisterModal.addEventListener('click', (e) => {
         e.preventDefault();
@@ -11,10 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Volver al login desde el modal de registro
-    const openLoginModal = document.getElementById('openLoginModal');
+
     openLoginModal.addEventListener('click', function() {
-        registerModal.style.display = 'none';
-        loginModal.style.display = 'block';
+        registerModal.classList.remove('show');
+        loginModal.classList.add('show');
     });
 
     closeButtons.forEach(btn => {
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             registerModal.classList.remove('show');
         });
     });
-
+/*
     window.addEventListener('click', (event) => {
         if (event.target === loginModal) {
             loginModal.classList.remove('show');
@@ -31,6 +32,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target === registerModal) {
             registerModal.classList.remove('show');
         }
-    });
+    });*/
 });
-

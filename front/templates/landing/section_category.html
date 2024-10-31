@@ -33,6 +33,8 @@
         color: inherit; /* Hereda el color del texto */
     }
     </style>
+
+    {% load static %}
     
     <section class="categories">
         <div class="container">
@@ -40,11 +42,11 @@
                 {% for categoria in categorias %}
                     <div class="col-6 col-md-3">
                         <div class="category-item">
-                            <a href="{% url 'productos' %}?categoria={{ categoria.id }}">
+                            <a href="{% url 'productos' %}?categoria={{ categoria.nombre }}">
                                 <div class="category-inner">
                                     <!-- Front Side -->
                                     <div class="category-front">
-                                        <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80{% endif %}" alt="{{ categoria.imagen }}">
+                                        <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ categoria.imagen }}">
                                         <h3>{{ categoria }}</h3>
                                     </div>
 

@@ -1,43 +1,45 @@
 <style>
 
-.newsletter {
-    padding: 4rem 0;
-    background-color: #14171A;
-    color: white;
-}
-.newsletter-form {
-    display: flex;
-    gap: 1rem;
-    max-width: 500px;
-    margin: 0 auto;
-}
-.newsletter-input {
-    flex-grow: 1;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-}
-.newsletter-button {
-    background-color: #1DA1F2;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.newsletter-button:hover {
-    background-color: #0c85d0;
-}
-</style>
-
-<section class="newsletter">
-    <div class="">
-        <h2 class="text-center mb-4">{{ landing.newsletter_title }}</h2>
-        <p class="text-center mb-4">{{ landing.newsletter_text }}</p>
-        <form class="newsletter-form">
-            <input type="email" class="newsletter-input" placeholder="Enter your email" required>
-            <button type="submit" class="newsletter-button">{{ landing.newsletter_btn_label }}</button>
-        </form>
-    </div>
-</section>
+    .newsletter {
+        padding: 4rem 0;
+        background-color: #14171A;
+        color: white;
+    }
+    
+    .newsletter-input {
+        flex-grow: 1;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+    }
+    .newsletter-button {
+        background-color: #1DA1F2;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .newsletter-button:hover {
+        background-color: #0c85d0;
+    }
+    
+    
+    </style>
+    
+    <section class="newsletter">
+        <div class="container">
+            <h2 class="text-center mb-4">{{ landing.newsletter_title }}</h2>
+            <p class="text-center mb-4">{{ landing.newsletter_text }}</p>
+            <form class="newsletter-form row justify-content-center">
+                <div class="col-md-4 col-12 mb-3">
+                    <input type="email" class="form-control newsletter-input" placeholder="Enter your email" required>
+                </div>
+                <div class="col-md-2 col-12 mb-3">
+                    <button type="submit" class="btn btn-primary newsletter-button w-100">{{ landing.newsletter_btn_label }}</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    

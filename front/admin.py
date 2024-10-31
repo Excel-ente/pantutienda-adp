@@ -1,15 +1,21 @@
 from django.contrib import admin
-from .models import Landing, Section
+from .models import Landing, Section, CategoryOrder
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
+
 class SectionInline(admin.TabularInline):
     model = Section
     extra = 1  # Permitir agregar más secciones
 
+class CategoryOrderInline(admin.TabularInline):
+    model = CategoryOrder
+    extra = 1  # Permitir agregar más categorías
+    fields = ('category', 'order')
+    ordering = ('order',)
 
 class LandingAdmin(ImportExportModelAdmin):
-    list_display = ('nombre','section_hero','section_category','section_gallery','about_us','testimonials','features','cta_section','newsletter')
-    inlines = [SectionInline,]
+    list_display = ('nombre','section_hero','section_category','section_gallery','about_us','testimonials','features','cta_section','newsletter', 'section_clients')
+    inlines = [SectionInline,CategoryOrderInline]
     fieldsets = (
         ('Hero Section', {
             'fields': ('section_hero', 'hero_background_image', 'hero_title', 'hero_description'),
@@ -46,6 +52,15 @@ class LandingAdmin(ImportExportModelAdmin):
         }),
         ('Newsletter Section', {
             'fields': ('newsletter', 'newsletter_title', 'newsletter_text', 'newsletter_btn_label'),
+            'classes': ('collapse',),
+        }),
+        ('Nuestros Clientes Section', {
+            'fields': ('section_clients', 'clients_title', 'clients_text', 'clients_logo_1', 'clients_logo_2', 
+                       'clients_logo_3', 'clients_logo_4'),
+            'classes': ('collapse',),
+        }),
+        ('Footer', {
+            'fields': ('footer_section', 'footer_text', 'footer_icon'),
             'classes': ('collapse',),
         }),
     )

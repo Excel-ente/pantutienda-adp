@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from configuracion.forms import ConfiguracionForm
-from front.models import Landing
-from inventario.models import Categoria, Deposito, Producto,ProductoPrecio
+from front.models import Landing, CategoryOrder
+from inventario.models import Categoria, Deposito, Producto,ProductoPrecio, Categoria
 from seguridad.views import obtener_info_ip
 from pedidos.models import Pedido
 from agenda.models import Cliente,Proveedor,Chofer,Vendedor,DireccionEntregaCliente
@@ -248,19 +248,49 @@ def productos(request):
             'producto_id': pp.producto.id,
             'producto_nombre': pp.producto.nombre,
             'producto_imagen': pp.producto.imagen.url if pp.producto.imagen else '',
+            'producto_categoria': pp.producto.categoria.nombre if pp.producto.categoria else '',
             'precio_unitario': float(pp.precio_unitario_calculado()),
             'presentacion': str(pp),  # Convertimos a cadena
             'cantidad': pp.cantidad,
             'unidad_de_medida': str(pp.unidad_de_medida),  # Convertimos a cadena
+            
         })
 
     # Serializamos los datos a JSON y los marcamos como seguros
     productos_precio_json = mark_safe(json.dumps(productos_precio_list))
 
+    landing = Landing.objects.first()
+
+    # Obtenemos los IDs de categorías en el orden definido
+    categorias_ordenadas_ids = list(CategoryOrder.objects.filter(landing=landing).order_by('order').values_list('category_id', flat=True))
+
+    # Cargamos las instancias completas de categorías, manteniendo el orden
+    categorias_in_bulk = Categoria.objects.in_bulk(categorias_ordenadas_ids)
+    categorias = [categorias_in_bulk[id] for id in categorias_ordenadas_ids if id in categorias_in_bulk]
+
+     # Preparamos los datos de categorías para el template
+    categorias_list = []
+    for categoria in categorias:
+        categorias_list.append({
+            'id': categoria.id,
+            'nombre': categoria.nombre,
+            'imagen': categoria.imagen.url if categoria.imagen else ''  # Si tienes un campo de imagen en la categoría
+        })
+    
+    # Serializamos los datos a JSON y los marcamos como seguros
+    categorias_json = mark_safe(json.dumps(categorias_list))
+
+    categorias_ordenadas = mark_safe(json.dumps(list(CategoryOrder.objects.filter(landing=landing).order_by('order').values('category', 'category__nombre'))))
+
+
     context = {
         'cliente_habilitado': cliente_habilitado,
         'es_cliente': es_cliente,
         'productos_precio_json': productos_precio_json,
+        'categorias_json': categorias_json,
+        'categorias_ordenadas_json': categorias_ordenadas,
+        
+
     }
     return render(request, 'productos.html', context)
 
@@ -293,6 +323,7 @@ def pedidos_view(request):
                 {
                     'producto': item.producto.nombre,
                     'cantidad': item.cantidad,
+                    'precio': item.precio_unitario,
                     'subtotal': item.subtotal()
                 }
                 for item in pedido.items.all()
@@ -317,7 +348,6 @@ def confirmar_pedido(request):
     cliente = Cliente.objects.filter(usuario=request.user).first()
     depositos = Deposito.objects.all()  # Obtén los depósitos disponibles
     depositos_list = [{'id': deposito.id, 'nombre': deposito.nombre} for deposito in depositos]
-
 
 
     if not cliente:
@@ -354,8 +384,9 @@ def confirmar_pedido(request):
             # Obtener depósito predeterminado si no se proporciona `deposito_id`
             if not deposito_id:
                 configuracion_obj = configuracion.objects.first()
+
                 if configuracion_obj:
-                    deposito_id = configuracion_obj.deposito_id  # Asegúrate de que `deposito_id` esté en `configuracion`
+                    deposito_id = configuracion_obj.deposito_central.id  # Asegúrate de que `deposito_id` esté en `configuracion`
                 else:
                     return JsonResponse({'error': 'No se pudo determinar el depósito.'}, status=400)
 
@@ -433,8 +464,9 @@ def custom_login(request):
                 pais=info_ip['pais'],
                 organizacion=info_ip['organizacion']
             )
-
             messages.error(request, 'Usuario o contraseña incorrectos.')
+            return redirect('home')
+
     
     return render(request, 'login.html')
     

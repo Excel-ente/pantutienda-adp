@@ -1,0 +1,55 @@
+<style>
+    .clients {
+        padding: 4rem 0;
+    }
+    .client-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .client-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .client-logo {
+        width: 100px; /* Ajusta el tamaño del logo */
+        height: auto;
+        
+    }
+</style>
+
+<section class="clients">
+    <div class="">
+        <h2 class="text-center mb-4">{{ landing.clients_title }}</h2>
+        <p class="text-center mb-4">{{ landing.clients_text }}</p> <!-- Texto adicional si es necesario -->
+        <div class="row g-2">
+            <div class="col-md-3">
+                <div class="client-card text-center">
+                    <img src="{{ landing.clients_logo_1.url }}" alt="Client 1 logo" class="client-logo">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="client-card text-center">
+                    <img src="{{ landing.clients_logo_2.url }}" alt="Client 2 logo" class="client-logo">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="client-card text-center">
+                    <img src="{{ landing.clients_logo_3.url }}" alt="Client 3 logo" class="client-logo">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="client-card text-center">
+                    <img src="{{ landing.clients_logo_4.url }}" alt="Client 4 logo" class="client-logo">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

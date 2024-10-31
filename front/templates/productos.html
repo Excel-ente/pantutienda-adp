@@ -6,21 +6,40 @@
 <style>
 
     .product-card {
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
-        margin-bottom: 20px;
-        cursor: pointer;
+        width: 200px; /* Ancho mínimo para cada tarjeta de producto */
+        margin-right: 1rem; /* Espacio entre las tarjetas */
+        flex: 0 0 auto; /* Para que no se expandan */
+        border: 1px solid #ddd; /* Opcional: borde para las tarjetas */
+        border-radius: 8px; /* Opcional: bordes redondeados */
+        text-align: center; /* Centramos el texto */
+        background-color: #fff; /* Color de fondo */
+        padding: 10px; /* Espaciado interno de las tarjetas */
+        
+    }
+    .product-group {
+        display: flex; /* Hacemos que los productos se alineen en fila */
+        overflow-x: auto; /* Habilitamos el scroll horizontal */
+        padding: 10px 0; /* Espaciado interno para la sección */
+        flex-wrap: nowrap; /* Asegura que los productos no se envuelvan */
+        flex-direction: column;
+        max-height: 300px;
+        align-content: flex-start;
     }
     .product-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
     .product-img {
-        height: 200px;
-        object-fit: cover;
-        border-radius: 10px 10px 0 0;
+        width: 100%; /* La imagen ocupa el 100% del contenedor */
+        height: auto; /* Mantener la proporción de la imagen */
+        border-radius: 4px; /* Bordes redondeados en las imágenes */
+        height: 150px;
     }
     .product-title,
     .product-category {
@@ -29,7 +48,15 @@
     }
     .product-title {
         font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        height: 1.5rem; /* Establece la altura fija aquí */
+        line-height: 1.5rem; /* Alinea el texto verticalmente */
+        overflow: hidden; /* Oculta el contenido adicional */
+        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+        text-overflow: ellipsis; /* Añade "..." si el texto es demasiado largo */
     }
+
     .product-category,
     .product-price {
         color: #28a745;
@@ -45,24 +72,26 @@
         gap: 15px;
         padding: 15px;
     }
+
+    
     .product-card {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+        min-width: 150px; /* Ancho mínimo para cada tarjeta de producto */
+        margin-right: 1rem; /* Espacio entre las tarjetas */
+        border: 1px solid #ddd; /* Opcional: borde para las tarjetas */
+        border-radius: 8px; /* Opcional: bordes redondeados */
+        text-align: center; /* Centramos el texto */
+        background-color: #fff; /* Color de fondo */
+        padding: 10px; /* Espaciado interno de las tarjetas */
     }
-    .product-img {
-        height: 150px;
-    }
+
+
     .product-info {
         padding: 10px;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
     }
-    .product-title {
-        font-size: 0.9rem;
-        margin-bottom: 5px;
-    }
+
     .product-price {
         margin-top: auto;
     }
@@ -88,6 +117,7 @@
         width: 90%;
         max-width: 400px;
         animation: slideIn 0.3s ease-out;
+        align-items: center;
     }
     @keyframes slideIn {
         from {
@@ -106,7 +136,7 @@
         font-weight: bold;
         cursor: pointer;
         color: #aaa;
-        float: right;
+        align-self: end;
     }
     .close:hover {
         color: #000;
@@ -119,7 +149,7 @@
         margin-bottom: 10px;
     }
     .quantity-btn {
-        background-color: #28a745;
+        background-color:#007bff ;
         color: white;
         border: none;
         padding: 8px;
@@ -150,7 +180,7 @@
         color: #28a745;
     }
     .btn-submit {
-        background-color: #007bff;
+        background-color: #28a745;
         border: none;
         padding: 10px;
         font-size: 18px;
@@ -199,6 +229,18 @@
         vertical-align: middle;
     }
 
+    .category-card{
+        cursor: pointer;
+    }
+
+    .category-title {
+        overflow: hidden;            /* Oculta el texto que no cabe */
+        white-space: nowrap;         /* Evita el salto de línea */
+        text-overflow: ellipsis;     /* Agrega puntos suspensivos (...) */
+        max-width: 100%;             /* Asegúrate de que el ancho sea adecuado */
+        display: inline-block;        /* Necesario para que el max-width funcione */
+    }
+
 
     /* Ajustar estilos en dispositivos móviles */
     @media (max-width: 768px) {
@@ -226,57 +268,94 @@
 
 {% block content %}
 <div class="container cart-container">
-    <h2 class="cart-title"><i class="fas fa-shopping-bag"></i>&nbsp; Productos disponibles</h2>
-    <hr>
     
-    <div class="product-container" id="productContainer">
-        <!-- Los productos se renderizarán aquí mediante JavaScript -->
-    </div>
+        <!-- Búsqueda -->
+        <div class="row w-100 align-items-center">
+            <div class="col-8 col-md-10">
+                <div class="input-group w-md-50">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar producto...">
+                    <span class="input-group-text bg-white border-left-0">
+                        <i class="fa fa-search text-muted"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-4 col-md-2 d-flex justify-content-end p-0">
+                <button type="button" class="btn btn-outline-danger"  id="resetFiltersBtn"> <i class="fa fa-times"></i> Filtros</button>
+            </div>
+        </div>
+        
+        
 
-    <!-- Modal -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <button id="closeBtn" class="close">&times;</button>
-            <img id="modalImage" src="" class="img-fluid mb-3" style="max-width: 100%;" alt="Producto">
-            <h2 id="modalTitle" style="font-size: 1.5rem;"></h2>
+    <hr>
+    <div id="productContainer">
+            <!-- Categorías -->
 
-            <form method="POST" action="{% url 'agregar_al_carrito' %}">
-                {% csrf_token %}
-                <input type="hidden" name="product_precio_id" id="productPrecioId">
-                <input type="hidden" name="id" id="productId">
+        <div class="container">
+            <div class="row" id="categoryContainer"> <!-- Asegúrate de que el ID esté aquí -->
+                <!-- Las categorías se renderizarán aquí mediante JavaScript -->
+            </div>
+            
+        </div>
+        
+        <hr>
+            
+        </div>
+
+        <!-- Productos -->
+        
+        <div class="product-container" id="productContainer">
+            <!-- Los productos se renderizarán aquí mediante JavaScript -->
+        </div>
+
+        <!-- Modal -->
+        <div id="productModal" class="modal">
+            <div class="modal-content">
+                <button id="closeBtn" class="close">&times;</button>
+                <img id="modalImage" src="" class="img-fluid mb-3" style="max-width: 100px;" alt="Producto">
+                <h2 id="modalTitle" style="font-size: 1.5rem;"></h2>
+
+                <form method="POST" action="{% url 'agregar_al_carrito' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_precio_id" id="productPrecioId">
+                    <input type="hidden" name="id" id="productId">
+                    
+                    <div class="mb-3">
+                        <label for="priceSelect" class="form-label">Selecciona la presentación:</label>
+                        <select id="priceSelect" class="form-select"></select>
+                    </div>
                 
-                <div class="mb-3">
-                    <label for="priceSelect" class="form-label">Selecciona la presentación:</label>
-                    <select id="priceSelect" class="form-select"></select>
-                </div>
-            
-                <div class="quantity-container mb-3">
-                    <button type="button" id="decrease" class="quantity-btn">-</button>
-                    <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="quantity-input">
-                    <button type="button" id="increase" class="quantity-btn">+</button>
-                </div>
-            
-                <div class="total-container">
-                    <span id="totalAmount">$0.00</span>
-                </div>
-            
-                {% if es_cliente %}
-                    {% if cliente_habilitado %}
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-cart-plus"></i> Agregar al carrito
-                    </button>
+                    <div class="quantity-container mb-3">
+                        <button type="button" id="decrease" class="quantity-btn">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" name="quantity" id="quantityInput" value="1" min="1" class="quantity-input">
+                        <button type="button" id="increase" class="quantity-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                
+                    <div class="total-container">
+                        <span id="totalAmount">$0.00</span>
+                    </div>
+                
+                    {% if es_cliente %}
+                        {% if cliente_habilitado %}
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                        {% else %}
+                        <p class="text-warning text-center mt-3">
+                            <i class="fas fa-exclamation-circle"></i> Cuenta Suspendida
+                        </p>
+                        {% endif %}
                     {% else %}
-                    <p class="text-warning text-center mt-3">
-                        <i class="fas fa-exclamation-circle"></i> Cuenta Suspendida
-                    </p>
+                        <p class="text-warning text-center mt-3">
+                            <i class="fas fa-exclamation-circle"></i> Necesitas una cuenta verificada para agregar productos al carrito.
+                        </p>
                     {% endif %}
-                {% else %}
-                    <p class="text-warning text-center mt-3">
-                        <i class="fas fa-exclamation-circle"></i> Necesitas una cuenta verificada para agregar productos al carrito.
-                    </p>
-                {% endif %}
-            </form>
-            
+                </form>
+                
+            </div>
         </div>
     </div>
 </div>
@@ -284,6 +363,9 @@
 <!-- Incluimos los datos de los productos precio en una variable JavaScript -->
 <script type="text/javascript">
     var productosPrecioData = {{ productos_precio_json }};
+    var categoriasData = {{ categorias_json }};
+    var categoriasOrdenadas = {{ categorias_ordenadas_json }};
+
 </script>
 
 {% endblock %}
@@ -314,6 +396,7 @@
                     id: productId,
                     nombre: pp.producto_nombre,
                     imagen: pp.producto_imagen,
+                    categoria: pp.producto_categoria || "Otros productos",
                     precios: []
                 };
             }
@@ -323,22 +406,79 @@
         // Convertimos el mapa a una lista
         const productsList = Object.values(productsMap);
 
-        // Renderizamos los productos en el contenedor
+        // Agrupar productos por categoría
+        const productsByCategory = {};
         productsList.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.dataset.id = product.id;
+            const categoryName = product.categoria;
+            if (!productsByCategory[categoryName]) {
+                productsByCategory[categoryName] = [];
+            }
+            productsByCategory[categoryName].push(product);
+        });
 
-            const imgSrc = product.imagen || '{% static "img/default.png" %}';
+        
+
+        // Renderizamos los productos agrupados por categoría en el orden definido
+        categoriasOrdenadas.forEach(c=> {
+            
+            let categoryId = c.category
+            let categoryNombre = c.category__nombre
+            
+            const category = categoriasData.find(c => c.id === categoryId);
+            const products = productsByCategory[category.nombre] || []; // Obtener productos de la categoría
+    
+            const categoryCard = document.createElement('div');
+            categoryCard.className = 'mb-4';
+            categoryCard.id = `categoria-${categoryNombre}`;
+            categoryCard.innerHTML = `<h3>${category.nombre}</h3>`;
+    
+            const productGroup = document.createElement('div');
+            productGroup.className = 'product-group d-flex flex-wrap';
+    
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card mb-0';
+                card.dataset.id = product.id;
+    
+                const imgSrc = product.imagen || '{% static "img/default.png" %}';
+    
+                card.innerHTML = `
+                    <img src="${imgSrc}" class="product-img p-2" alt="${product.nombre}">
+                    <div class="product-info">
+                        <h5 class="product-title">${product.nombre}</h5>
+                        <p class="product-price">Desde: ${formatCurrency(product.precios[0].precio_unitario.toFixed(2))}</p>
+                    </div>
+                `;
+                productGroup.appendChild(card);
+            });
+
+            categoryCard.appendChild(productGroup);
+            productContainer.appendChild(categoryCard);
+           
+            if (productGroup.hasChildNodes()) {
+                categoryCard.innerHTML += `<p class="no-products-message" id="no-products-message-${categoryNombre}" style="display: none;">No hay productos en esta categoría.</p>`;
+            } else {
+                categoryCard.innerHTML += `<p class="no-products-message" id="no-products-message-${categoryNombre}" style="display: block;">No hay productos en esta categoría.</p>`
+            }
+
+
+
+        });
+        
+        const categoryContainer = document.getElementById('categoryContainer');
+
+        // Renderizamos las categorías en el contenedor
+        categoriasData.forEach(categoria => {
+            const card = document.createElement('div');
+            card.className = 'col-4 col-md-2 mb-3 p-1 '; // Clase de columna
 
             card.innerHTML = `
-                <img src="${imgSrc}" class="product-img" alt="${product.nombre}">
-                <div class="product-info">
-                    <h5 class="product-title">${product.nombre}</h5>
-                    <p class="product-price">Desde: ${formatCurrency(product.precios[0].precio_unitario.toFixed(2))}</p>
+                <div class="category-card h-100 text-center border rounded shadow-sm d-flex flex-column justify-content-between p-3 pt-2  pb-0 pe-0" data-categoria="${categoria.nombre}">
+                    <p class="category-title text-start align-self-start"> <strong> ${categoria.nombre} </strong></p>
+                    <img src="${categoria.imagen || '{% static "img/default.png" %}'}" class="category-img img-fluid mt-auto  align-self-end" alt="${categoria.nombre}">
                 </div>
             `;
-            productContainer.appendChild(card);
+            categoryContainer.appendChild(card);
         });
 
         function formatCurrency(value) {
@@ -350,7 +490,9 @@
         }
 
         function updateTotal() {
-            const quantity = parseInt(quantityInput.value);
+            
+            const quantity = parseInt(quantityInput.value) || 1;
+            quantityInput.value = quantity;
             const selectedOption = priceSelect.options[priceSelect.selectedIndex];
             const price = parseFloat(selectedOption.dataset.price);
             totalAmount.textContent = formatCurrency(quantity * price);
@@ -410,6 +552,115 @@
 
         priceSelect.addEventListener('change', updateTotal);
         quantityInput.addEventListener('input', updateTotal);
+
+        //Filtrar productos
+
+        const searchInput = document.getElementById('searchInput');
+        const categorySelect = document.getElementById('categorySelect');
+        
+        // Evento para resetear filtros al hacer clic en el campo de búsqueda
+        searchInput.addEventListener('focus', () => {
+            // Limpiar los filtros
+            searchInput.value = '';     // Vaciar el cuadro de búsqueda
+            selectedCategoryId = null;  // Eliminar categoría seleccionada
+
+            // Llamar a la función de filtrado para mostrar todos los productos
+            filterProducts();
+        });
+    
+        searchInput.addEventListener('input', filterProducts);
+
+        //Filtrar por categoría
+
+        categoryContainer.addEventListener('click', (event) => {
+            resetFilters()
+            const target = event.target.closest('.category-card');
+            if (target) {
+                selectedCategoryId = target.getAttribute('data-categoria'); // Asigna la categoría seleccionada
+                filterProducts(); // Llama a la función de filtrado
+            }
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        let selectedCategoryId = params.get('categoria') || null;
+        
+        if (selectedCategoryId) {
+            filterProducts()
+        }
+
+
+        function filterProducts() {
+            const searchQuery = searchInput.value.toLowerCase();
+        
+            // Obtener todos los contenedores de categorías
+            const categoryDivs = document.querySelectorAll('[id^="categoria-"]');
+        
+            // Ocultar todos los contenedores de categorías al principio
+            categoryDivs.forEach(categoryDiv => {
+                categoryDiv.style.display = 'none';
+            });
+
+           
+        
+            // Recorrer cada categoría y sus productos
+            categoryDivs.forEach(categoryDiv => {
+                const categoryName = categoryDiv.id.replace('categoria-', ''); // Obtener el nombre de la categoría
+        
+                let hasVisibleProducts = false; // Variable para determinar si hay productos visibles en esta categoría
+        
+                // Obtener todas las tarjetas de productos en esta categoría
+                const productCards = categoryDiv.querySelectorAll('.product-card');
+        
+                productCards.forEach(card => {
+                    const productId = card.dataset.id;
+                    const product = productsList.find(p => p.id == productId); // Obtener el producto correspondiente
+        
+                    const matchesName = product.nombre.toLowerCase().includes(searchQuery);
+                    const matchesCategory = selectedCategoryId ? product.categoria === selectedCategoryId : true;
+        
+                    // Muestra u oculta la tarjeta del producto
+                    if (matchesName && matchesCategory) {
+                        card.style.display = 'block';
+                        hasVisibleProducts = true; // Hay al menos un producto visible
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+        
+                // Mostrar el div de la categoría si hay productos visibles
+                if (hasVisibleProducts) {
+                    categoryDiv.style.display = 'block';
+                } else {
+                    
+                    // Si no hay productos visibles, muestra el mensaje
+                        if (selectedCategoryId !== categoryName) {
+                            categoryDiv.style.display = 'none'; 
+                        } else {
+                            categoryDiv.style.display = 'block';
+                            const noProductsMessage = categoryDiv.querySelector('.no-products-message');
+                            noProductsMessage.style.display = 'block'
+                        }
+                    }
+                
+                
+            });
+        }
+        
+        //Resetear Filtros
+        function resetFilters() {
+            // Resetear los filtros
+            searchInput.value = '';            // Vaciar el cuadro de búsqueda
+            selectedCategoryId = null;         // Eliminar categoría seleccionada
+        
+            // Llamar a la función de filtrado para mostrar todos los productos
+            filterProducts();
+        }
+        
+
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+        resetFiltersBtn.addEventListener('click', () => {
+            resetFilters()
+        });
     });
 </script>
 {% endblock %}

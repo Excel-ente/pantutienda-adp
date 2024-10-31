@@ -56,19 +56,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url);
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
             const data = await response.json();
+            console.log(data.pedidos)
 
             pedidosTableBody.innerHTML = '';
 
             data.pedidos.forEach(pedido => {
                 const row = document.createElement('tr');
-                row.classList.add('pedido-row');
+                
                 row.innerHTML = `
                     <td>${pedido.id}</td>
                     <td>$${Number(pedido.total).toFixed(2)}</td>
                     <td>${pedido.estado}</td>
                     <td>
-                        <button class="btn btn-info btn-sm ver-productos-btn">
-                            Ver Productos
+                        <button class="btn btn-sm btn-warning ver-productos-btn">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
                         </button>
                     </td>
                 `;
@@ -84,23 +85,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let currentlyOpenProductosRow = null;
+
     function toggleProductos(items, parentRow) {
+
         let productosRow = parentRow.nextElementSibling;
+        
+        if (currentlyOpenProductosRow && currentlyOpenProductosRow !== productosRow) {
+            currentlyOpenProductosRow.remove();
+            currentlyOpenProductosRow = null;
+        }
     
-        if (productosRow && productosRow.classList.contains('productos-row')) {
-            productosRow.remove(); 
-        } else {
+        if (!productosRow || !productosRow.classList.contains('productos-row')) {
             productosRow = document.createElement('tr');
             productosRow.classList.add('productos-row');
-            const productosHTML = items.map(item => `
-                <li>${item.cantidad} x ${item.producto} - $${Number(item.subtotal).toFixed(2)}</li>
-            `).join('');
-            productosRow.innerHTML = `<td colspan="4"><ul>${productosHTML}</ul></td>`;
+            const productosHTML = `
+                <td colspan="4">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(item => `
+                                <tr>
+                                    <td>${item.producto}<br>
+                                    (${item.cantidad} x $${Number(item.precio).toFixed(2)})</td>
+                                    <td>$${Number(item.subtotal).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </td>
+            `;
+            productosRow.innerHTML = productosHTML;
             parentRow.after(productosRow);
-    
-            // Asegurar que el nuevo contenido no desborde el modal
-            const tableContainer = document.querySelector('.table-container');
-            tableContainer.scrollTop = tableContainer.scrollHeight;
+            currentlyOpenProductosRow = productosRow;
+        } else {
+            productosRow.remove();
+            currentlyOpenProductosRow = null;
         }
     }
     

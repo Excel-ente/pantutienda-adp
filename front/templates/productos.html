@@ -261,6 +261,21 @@
         }
     }
 
+    .category-container {
+        display: flex;
+        overflow-x: auto; /* Habilita el desplazamiento horizontal */
+        white-space: nowrap; /* Evita el salto de línea */
+        gap: 10px; /* Espacio entre las categorías */
+    }
+
+    /* Elimina esta sección para mostrar la barra de desplazamiento */
+    .category-container::-webkit-scrollbar {
+        display: block; /* Deja la barra de desplazamiento visible */
+    }
+
+    #resetFiltersBtn {
+        display: none; /* Ocultamos el botón por defecto */
+    }
 
 
 </style>
@@ -291,7 +306,7 @@
             <!-- Categorías -->
 
         <div class="container">
-            <div class="row" id="categoryContainer"> <!-- Asegúrate de que el ID esté aquí -->
+            <div class="category-container"  id="categoryContainer"> <!-- Asegúrate de que el ID esté aquí -->
                 <!-- Las categorías se renderizarán aquí mediante JavaScript -->
             </div>
             
@@ -427,6 +442,9 @@
             const category = categoriasData.find(c => c.id === categoryId);
             const products = productsByCategory[category.nombre] || []; // Obtener productos de la categoría
     
+            // Verificamos si la categoría tiene productos antes de renderizarla
+            if (products.length === 0) return; // Si no hay productos, omite esta categoría
+            
             const categoryCard = document.createElement('div');
             categoryCard.className = 'mb-4';
             categoryCard.id = `categoria-${categoryNombre}`;
@@ -591,61 +609,49 @@
 
         function filterProducts() {
             const searchQuery = searchInput.value.toLowerCase();
-        
-            // Obtener todos los contenedores de categorías
             const categoryDivs = document.querySelectorAll('[id^="categoria-"]');
-        
-            // Ocultar todos los contenedores de categorías al principio
+            let isFiltered = false; // Variable para controlar si hay un filtro activo
+
+            // Ocultamos todos los contenedores de categorías al principio
             categoryDivs.forEach(categoryDiv => {
                 categoryDiv.style.display = 'none';
             });
 
-           
-        
             // Recorrer cada categoría y sus productos
             categoryDivs.forEach(categoryDiv => {
-                const categoryName = categoryDiv.id.replace('categoria-', ''); // Obtener el nombre de la categoría
-        
-                let hasVisibleProducts = false; // Variable para determinar si hay productos visibles en esta categoría
-        
-                // Obtener todas las tarjetas de productos en esta categoría
+                const categoryName = categoryDiv.id.replace('categoria-', '');
+                let hasVisibleProducts = false;
+
                 const productCards = categoryDiv.querySelectorAll('.product-card');
-        
                 productCards.forEach(card => {
                     const productId = card.dataset.id;
-                    const product = productsList.find(p => p.id == productId); // Obtener el producto correspondiente
-        
+                    const product = productsList.find(p => p.id == productId);
+
                     const matchesName = product.nombre.toLowerCase().includes(searchQuery);
                     const matchesCategory = selectedCategoryId ? product.categoria === selectedCategoryId : true;
-        
-                    // Muestra u oculta la tarjeta del producto
+
                     if (matchesName && matchesCategory) {
                         card.style.display = 'block';
-                        hasVisibleProducts = true; // Hay al menos un producto visible
+                        hasVisibleProducts = true;
                     } else {
                         card.style.display = 'none';
                     }
                 });
-        
-                // Mostrar el div de la categoría si hay productos visibles
+
                 if (hasVisibleProducts) {
                     categoryDiv.style.display = 'block';
-                } else {
-                    
-                    // Si no hay productos visibles, muestra el mensaje
-                        if (selectedCategoryId !== categoryName) {
-                            categoryDiv.style.display = 'none'; 
-                        } else {
-                            categoryDiv.style.display = 'block';
-                            const noProductsMessage = categoryDiv.querySelector('.no-products-message');
-                            noProductsMessage.style.display = 'block'
-                        }
-                    }
-                
-                
+                }
+
+                // Si hay algún filtro aplicado, establecemos isFiltered en true
+                if (searchQuery || selectedCategoryId) {
+                    isFiltered = true;
+                }
             });
+
+            // Mostrar el botón de eliminar filtros solo si hay un filtro activo
+            resetFiltersBtn.style.display = isFiltered ? 'inline-block' : 'none';
         }
-        
+                
         //Resetear Filtros
         function resetFilters() {
             // Resetear los filtros

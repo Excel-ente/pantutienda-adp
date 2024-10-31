@@ -1,61 +1,76 @@
 <style>
-    .categories {
-        padding: 3rem 0;
-    }
-    .category-item {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .category-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-    .category-item img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-    }
-    .category-item h3 {
-        padding: 1rem;
-        margin: 0;
-        font-size: 1.2rem;
-        text-align: center;
-        color: black; /* Texto en negro */
-        text-decoration: none; /* Sin subrayado */
-    }
+.categories {
+    padding: 3rem 0;
+}
 
-    .category-item a {
-        text-decoration: none; /* Evita que el enlace esté subrayado */
-        color: inherit; /* Hereda el color del texto */
-    }
-    </style>
+.category-container {
+    display: flex;
+    overflow-x: auto; /* Habilita el desplazamiento horizontal */
+    gap: 10px; /* Espacio entre tarjetas */
+    white-space: nowrap; /* Mantiene las tarjetas en una fila */
+}
+
+.category-container::-webkit-scrollbar {
+    display: none; /* Oculta la barra de desplazamiento en navegadores Webkit */
+}
+
+.category-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 200px; /* Establece el ancho mínimo para cada tarjeta */
+}
+
+.category-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.category-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.category-item h3 {
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    color: black;
+    text-decoration: none;
+}
+
+.category-item a {
+    text-decoration: none;
+    color: inherit;
+}
+
+
+</style>
 
     {% load static %}
     
     <section class="categories">
         <div class="container">
-            <div class="row">
+            <div class="category-container">
                 {% for categoria in categorias %}
-                    <div class="col-6 col-md-3">
-                        <div class="category-item">
-                            <a href="{% url 'productos' %}?categoria={{ categoria.nombre }}">
-                                <div class="category-inner">
-                                    <!-- Front Side -->
-                                    <div class="category-front">
-                                        <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ categoria.imagen }}">
-                                        <h3>{{ categoria }}</h3>
-                                    </div>
-
+                    <div class="category-item">
+                        <a href="{% url 'productos' %}?categoria={{ categoria.nombre }}">
+                            <div class="category-inner">
+                                <div class="category-front">
+                                    <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ categoria.imagen }}">
+                                    <h3>{{ categoria }}</h3>
                                 </div>
-                            </a>
-                        </div>
+                            </div>
+                        </a>
                     </div>
                 {% endfor %}
             </div>
         </div>
     </section>
+    
     

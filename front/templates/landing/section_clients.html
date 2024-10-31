@@ -1,3 +1,4 @@
+
 <style>
     .clients {
         padding: 4rem 0;
@@ -21,31 +22,30 @@
     .client-logo {
         width: 100px; /* Ajusta el tamaño del logo */
         height: auto;
-        
     }
 </style>
 
 <section class="clients">
     <div class="">
         <h2 class="text-center mb-4">{{ landing.clients_title }}</h2>
-        <p class="text-center mb-4">{{ landing.clients_text }}</p> <!-- Texto adicional si es necesario -->
+        <p class="text-center mb-4">{{ landing.clients_text }}</p>
         <div class="row g-2">
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="client-card text-center">
                     <img src="{{ landing.clients_logo_1.url }}" alt="Client 1 logo" class="client-logo">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="client-card text-center">
                     <img src="{{ landing.clients_logo_2.url }}" alt="Client 2 logo" class="client-logo">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="client-card text-center">
                     <img src="{{ landing.clients_logo_3.url }}" alt="Client 3 logo" class="client-logo">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="client-card text-center">
                     <img src="{{ landing.clients_logo_4.url }}" alt="Client 4 logo" class="client-logo">
                 </div>
@@ -53,3 +53,4 @@
         </div>
     </div>
 </section>
+

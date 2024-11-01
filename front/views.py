@@ -175,7 +175,7 @@ def home(request):
             'landing': landing,
             'secciones': secciones,
             'categorias': categorias,
-            'segundos': segundos,
+            'segundos': segundos * 1000,
             'usuario': 'Anónimo',
             'numero_usuario': None,
             'tipo_cliente': 'Visitante',

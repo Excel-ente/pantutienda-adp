@@ -100,6 +100,11 @@ class Landing(models.Model):
     footer_section = models.BooleanField(default=False)
     footer_text = models.CharField(max_length=200, null=True, blank=True)
     footer_icon = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    footer_background_color = models.CharField(
+        max_length=7, 
+        default="#ffffff",  # Valor por defecto en blanco
+        help_text="Color de fondo en formato hexadecimal (ej. #ffffff para blanco)"
+    )
 
     # Nueva sección de banners promocionales
     section_promo_banners = models.BooleanField(default=False)

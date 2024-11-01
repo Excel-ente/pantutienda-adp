@@ -68,10 +68,12 @@ class LandingAdmin(ImportExportModelAdmin):
             'classes': ('collapse',),
         }),
         ('Pie_pagina', {
-            'fields': ('footer_section', 'footer_text', 'footer_icon'),
+            'fields': ('footer_section', 'footer_text', 'footer_icon','footer_background_color'),
             'classes': ('collapse',),
         }),
     )
+
+
 
     class Media:
         js = ('js/landing_admin.js',)  # Incluye tu archivo JavaScript

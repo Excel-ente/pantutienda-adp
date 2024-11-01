@@ -276,6 +276,10 @@
     #resetFiltersBtn {
         display: none; /* Ocultamos el botón por defecto */
     }
+    .selected-category {
+        background-color: #ffcccc; /* Fondo rojo claro */
+        border: 2px solid #ff0000; /* Borde rojo */
+    }
 
 
 </style>
@@ -591,13 +595,22 @@
         //Filtrar por categoría
 
         categoryContainer.addEventListener('click', (event) => {
-            resetFilters()
+            resetFilters(); // Reseteamos cualquier filtro anterior
+
+            // Remover la clase de categoría seleccionada de todas las tarjetas
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected-category');
+            });
+
+            // Aplicar la clase 'selected-category' a la tarjeta seleccionada
             const target = event.target.closest('.category-card');
             if (target) {
+                target.classList.add('selected-category'); // Añade la clase de categoría seleccionada
                 selectedCategoryId = target.getAttribute('data-categoria'); // Asigna la categoría seleccionada
                 filterProducts(); // Llama a la función de filtrado
             }
         });
+
 
         const params = new URLSearchParams(window.location.search);
         let selectedCategoryId = params.get('categoria') || null;
@@ -657,7 +670,12 @@
             // Resetear los filtros
             searchInput.value = '';            // Vaciar el cuadro de búsqueda
             selectedCategoryId = null;         // Eliminar categoría seleccionada
-        
+
+            // Remover la clase de categoría seleccionada de todas las tarjetas
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected-category');
+            });
+
             // Llamar a la función de filtrado para mostrar todos los productos
             filterProducts();
         }

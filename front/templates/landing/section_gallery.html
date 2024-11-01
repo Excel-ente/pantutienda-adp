@@ -26,7 +26,7 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(10px); /* Efecto blur */
+        backdrop-filter: blur(10px);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -34,27 +34,41 @@
         color: white;
         opacity: 0;
         transition: opacity 0.3s ease;
+        padding: 10px; /* Añade padding para espaciar el texto del borde */
+        text-align: center;
     }
     .gallery-item:hover .gallery-overlay {
         opacity: 1;
     }
     .gallery-overlay h3 {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.3rem;
+        word-wrap: break-word; /* Permite que el texto se ajuste en varias líneas si es largo */
     }
     .gallery-overlay p {
-        font-size: 1rem;
-        padding: 0 1rem;
-        text-align: center;
+        font-size: 0.9rem;
+        padding: 0 0.5rem; /* Ajusta el padding para mejorar el margen en pantallas pequeñas */
     }
 
-    /* Mostrar siempre el overlay en dispositivos móviles */
+    /* Ajustes específicos para dispositivos móviles */
     @media (max-width: 768px) {
-
+        .gallery-item img {
+            height: 200px;
+        }
+        .gallery-overlay {
+            padding: 8px; /* Reduce el padding en móviles */
+        }
+        .gallery-overlay h3 {
+            font-size: 1rem; /* Reduce el tamaño de fuente en móviles */
+            margin-bottom: 0.3rem;
+        }
+        .gallery-overlay p {
+            font-size: 0.8rem; /* Ajusta el tamaño del texto para pantallas pequeñas */
+            padding: 0 0.3rem;
+        }
     }
-
-
 </style>
+
 
 <section class="gallery">
     <div class="">

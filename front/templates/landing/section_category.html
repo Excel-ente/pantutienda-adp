@@ -1,76 +1,92 @@
 <style>
-.categories {
-    padding: 3rem 0;
-}
+    .categories {
+        padding: 3rem 0;
+    }
 
-.category-container {
-    display: flex;
-    overflow-x: auto; /* Habilita el desplazamiento horizontal */
-    gap: 10px; /* Espacio entre tarjetas */
-    white-space: nowrap; /* Mantiene las tarjetas en una fila */
-}
+    .category-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        white-space: nowrap;
+    }
 
-.category-container::-webkit-scrollbar {
-    display: none; /* Oculta la barra de desplazamiento en navegadores Webkit */
-}
+    .category-container::-webkit-scrollbar {
+        display: none;
+    }
 
-.category-item {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1rem;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-width: 200px; /* Establece el ancho mínimo para cada tarjeta */
-}
+    .category-item {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        min-width: 200px;
+    }
 
-.category-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+    .category-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
 
-.category-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
+    .category-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
 
-.category-item h3 {
-    padding: 1rem;
-    margin: 0;
-    font-size: 1.2rem;
-    text-align: center;
-    color: black;
-    text-decoration: none;
-}
+    .category-item h3 {
+        padding: 1rem;
+        margin: 0;
+        font-size: 1.2rem;
+        text-align: center;
+        color: black;
+        text-decoration: none;
+    }
 
-.category-item a {
-    text-decoration: none;
-    color: inherit;
-}
+    .category-item a {
+        text-decoration: none;
+        color: inherit;
+    }
 
+    /* Ajustes para dispositivos móviles */
+    @media (max-width: 768px) {
+        .category-item {
+            min-width: 150px; /* Reduce el ancho mínimo en móviles */
+        }
 
+        .category-item img {
+            height: 150px; /* Reduce la altura de la imagen en móviles */
+        }
+
+        .category-item h3 {
+            font-size: 1rem; /* Reduce el tamaño del texto en móviles */
+        }
+    }
 </style>
 
-    {% load static %}
-    
-    <section class="categories">
-        <div class="container">
-            <div class="category-container">
-                {% for categoria in categorias %}
-                    <div class="category-item">
+{% load static %}
+
+<section class="categories">
+    <h4>Categorias</h4>
+    <div class="container">
+        <div class="category-container">
+            {% for categoria in categorias %}
+                <div class="category-item">
+                    {% if request.user.is_authenticated %}
                         <a href="{% url 'productos' %}?categoria={{ categoria.nombre }}">
+                    {% endif %}
                             <div class="category-inner">
                                 <div class="category-front">
                                     <img src="{% if categoria.imagen %}{{ categoria.imagen.url }}{% else %}{% static 'img/default.png' %}{% endif %}" alt="{{ categoria.imagen }}">
                                     <h3>{{ categoria }}</h3>
                                 </div>
                             </div>
+                    {% if request.user.is_authenticated %}
                         </a>
-                    </div>
-                {% endfor %}
-            </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
         </div>
-    </section>
-    
-    
+    </div>
+</section>

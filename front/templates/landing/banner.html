@@ -1,0 +1,88 @@
+<style>
+    /* Estilos para el contenedor de banners */
+    .promo-banner-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilos para cada banner */
+    .promo-banner-slide {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        width: 100%;
+        height: 100%;
+        transition: left 0.5s ease-in-out;
+    }
+
+    /* Banner activo */
+    .promo-banner-slide.active {
+        left: 0;
+    }
+
+    /* Imagen del banner */
+    .promo-banner-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+</style>
+
+<section class="promo-banner-container">
+    {% if landing.banner_1_image %}
+        <div class="promo-banner-slide active">
+            {% if landing.banner_1_link %}
+                <a href="{{ landing.banner_1_link }}">
+            {% endif %}
+            <img src="{{ landing.banner_1_image.url }}" alt="Banner 1">
+            {% if landing.banner_1_link %}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if landing.banner_2_image %}
+        <div class="promo-banner-slide">
+            {% if landing.banner_2_link %}
+                <a href="{{ landing.banner_2_link }}">
+            {% endif %}
+            <img src="{{ landing.banner_2_image.url }}" alt="Banner 2">
+            {% if landing.banner_2_link %}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if landing.banner_3_image %}
+        <div class="promo-banner-slide">
+            {% if landing.banner_3_link %}
+                <a href="{{ landing.banner_3_link }}">
+            {% endif %}
+            <img src="{{ landing.banner_3_image.url }}" alt="Banner 3">
+            {% if landing.banner_3_link %}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let slides = document.querySelectorAll(".promo-banner-slide");
+        let currentSlide = 0;
+
+        function showNextSlide() {
+            slides[currentSlide].classList.remove("active");
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add("active");
+        }
+
+        setInterval(showNextSlide, {{ segundos }}); // Cambia cada 2 segundos
+    });
+</script>

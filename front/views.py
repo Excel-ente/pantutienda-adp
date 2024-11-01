@@ -137,6 +137,7 @@ def landing(request):
 
 def home(request):
 
+    segundos = 4
 
     config = configuracion.objects.first() # Asegúrate de que haya una landing en la base de datos
 
@@ -147,9 +148,6 @@ def home(request):
 
     if not landing:
         return redirect('onboarding')  # Si no hay un objeto landing, renderiza una página de error o similar.
-
-
-
 
     # Obtén las secciones activas y ordenadas
     secciones = landing.section_set.filter(is_active=True).order_by('order')
@@ -165,6 +163,7 @@ def home(request):
             'secciones': secciones,
             'categorias': categorias,
             'usuario': request.user.username,
+            'segundos': segundos * 1000,
             'tipo_cliente': perfil['tipo_cliente'],
             'numero_usuario': perfil['numero_usuario'],
             'empresa': perfil['empresa'],
@@ -176,6 +175,7 @@ def home(request):
             'landing': landing,
             'secciones': secciones,
             'categorias': categorias,
+            'segundos': segundos,
             'usuario': 'Anónimo',
             'numero_usuario': None,
             'tipo_cliente': 'Visitante',

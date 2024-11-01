@@ -16,6 +16,10 @@
             {% include "landing/section_hero.html" %}
         {% elif section.name == 'section_category' %}
             {% include "landing/section_category.html" %}
+        {% elif section.name == 'banner' %}
+            {% include "landing/banner.html" %}
+        {% elif section.name == 'como_trabajamos' %}
+            {% include "landing/como_trabajamos.html" %}
         {% elif section.name == 'section_gallery' %}
             {% include "landing/section_gallery.html" %}
         {% elif section.name == 'about_us' %}
@@ -28,7 +32,7 @@
             {% include "landing/section_cta_section.html" %}
         {% elif section.name == 'newsletter' %}
             {% include "landing/section_newsletter.html" %}
-            {% elif section.name == 'section_clients'%}
+        {% elif section.name == 'section_clients'%}
             {% include "landing/section_clients.html" %}
         {% elif section.name == 'footer'%}
             {% include "landing/footer.html" %}

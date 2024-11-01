@@ -101,6 +101,40 @@ class Landing(models.Model):
     footer_text = models.CharField(max_length=200, null=True, blank=True)
     footer_icon = models.ImageField(upload_to='img/landing/', blank=True, null=True)
 
+    # Nueva sección de banners promocionales
+    section_promo_banners = models.BooleanField(default=False)
+    banner_1_image = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    banner_1_link = models.URLField(max_length=200, blank=True, null=True)
+    banner_2_image = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    banner_2_link = models.URLField(max_length=200, blank=True, null=True)
+    banner_3_image = models.ImageField(upload_to='img/landing/', blank=True, null=True)
+    banner_3_link = models.URLField(max_length=200, blank=True, null=True)
+
+    # Nueva sección de como trabajamos
+    section_how_we_work = models.BooleanField(default=False)
+    work_title = models.CharField(max_length=200, null=True, blank=True)
+    background_color_hww = models.CharField(
+        max_length=7, 
+        default="#ffffff",  # Valor por defecto en blanco
+        help_text="Color de fondo en formato hexadecimal (ej. #ffffff para blanco)"
+    )
+    
+    step_emoji_1 = models.CharField(max_length=5, null=True, blank=True, default="📞")
+    step_title_1 = models.CharField(max_length=100, null=True, blank=True, default="Realiza tu Pedido")
+    step_description_1 = models.TextField(null=True, blank=True, default="Llámanos o envíanos un mensaje con tu pedido.")
+
+    step_emoji_2 = models.CharField(max_length=5, null=True, blank=True, default="🥕")
+    step_title_2 = models.CharField(max_length=100, null=True, blank=True, default="Preparamos tu Pedido")
+    step_description_2 = models.TextField(null=True, blank=True, default="Seleccionamos las verduras frescas que solicitaste.")
+
+    step_emoji_3 = models.CharField(max_length=5, null=True, blank=True, default="✅")
+    step_title_3 = models.CharField(max_length=100, null=True, blank=True, default="Confirmación")
+    step_description_3 = models.TextField(null=True, blank=True, default="Te enviamos la confirmación de tu pedido.")
+
+    step_emoji_4 = models.CharField(max_length=5, null=True, blank=True, default="🚚")
+    step_title_4 = models.CharField(max_length=100, null=True, blank=True, default="Entrega")
+    step_description_4 = models.TextField(null=True, blank=True, default="Realizamos la entrega a domicilio martes y jueves.")
+
 
     class Meta:
         verbose_name = 'pagina'
@@ -111,11 +145,13 @@ class Section(models.Model):
     SECTION_CHOICES = [
         ('section_hero', 'Hero Section'),
         ('section_category', 'Category Section'),
+        ('banner', 'Banner'),
         ('section_gallery', 'Gallery Section'),
         ('about_us', 'About Us Section'),
         ('testimonials', 'Testimonials Section'),
         ('features', 'Features Section'),
         ('cta_section', 'Call to Action Section'),
+        ('como_trabajamos','Como Trabajamos'),
         ('newsletter', 'Newsletter Section'),
         ('section_clients', 'Nuestros Clientes Section'),
         ('footer', 'Footer Section'),

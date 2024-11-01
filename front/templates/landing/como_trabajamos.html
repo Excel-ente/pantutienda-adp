@@ -1,0 +1,103 @@
+<style>
+    .how-we-work {
+        background-color: #f0f8ff;
+        padding: 4rem 0;
+    }
+
+    .how-we-work .section-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+
+    .work-step-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        min-height: 220px;
+        height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
+    }
+
+    .work-step-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .work-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .work-step-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+
+    .work-step-description {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-top: 0.5rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .work-step-card {
+            padding: 1.5rem;
+        }
+
+        .work-step-title {
+            font-size: 1rem;
+        }
+
+        .work-step-description {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<section class="how-we-work py-5" style="background-color: {{ landing.background_color_hww|default:'#ffffff' }};">
+    <div class="container">
+        <h2 class="section-title">{{ landing.work_title }}</h2>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
+                <div class="work-step-card">
+                    <div class="work-emoji">{{ landing.step_emoji_1 }}</div>
+                    <h5 class="work-step-title">{{ landing.step_title_1 }}</h5>
+                    <p class="work-step-description">{{ landing.step_description_1 }}</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
+                <div class="work-step-card">
+                    <div class="work-emoji">{{ landing.step_emoji_2 }}</div>
+                    <h5 class="work-step-title">{{ landing.step_title_2 }}</h5>
+                    <p class="work-step-description">{{ landing.step_description_2 }}</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
+                <div class="work-step-card">
+                    <div class="work-emoji">{{ landing.step_emoji_3 }}</div>
+                    <h5 class="work-step-title">{{ landing.step_title_3 }}</h5>
+                    <p class="work-step-description">{{ landing.step_description_3 }}</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-6 mb-4">
+                <div class="work-step-card">
+                    <div class="work-emoji">{{ landing.step_emoji_4 }}</div>
+                    <h5 class="work-step-title">{{ landing.step_title_4 }}</h5>
+                    <p class="work-step-description">{{ landing.step_description_4 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -140,7 +140,7 @@ def home(request):
     segundos = 4
 
     config = configuracion.objects.first() # Asegúrate de que haya una landing en la base de datos
-
+    
     if not config:
         return redirect('landing')  # Si no hay un objeto landing, renderiza una página de error o similar.
 
@@ -162,12 +162,12 @@ def home(request):
             'landing': landing,
             'secciones': secciones,
             'categorias': categorias,
+            'link_contacto': config.numero_contacto if config else None,
             'usuario': request.user.username,
             'segundos': segundos * 1000,
             'tipo_cliente': perfil['tipo_cliente'],
             'numero_usuario': perfil['numero_usuario'],
             'empresa': perfil['empresa'],
-            'link_contacto': '+541157045506',
             'mensaje': f'Hola, soy {request.user}, me contacto por ...',
         }
     else:
@@ -175,11 +175,11 @@ def home(request):
             'landing': landing,
             'secciones': secciones,
             'categorias': categorias,
+            'link_contacto': config.numero_contacto if config else None,
             'segundos': segundos * 1000,
             'usuario': 'Anónimo',
             'numero_usuario': None,
             'tipo_cliente': 'Visitante',
-            'link_contacto': '+541157045506',
             'mensaje': 'Hola, soy un visitante, me contacto por...',
         }
 
@@ -193,12 +193,15 @@ def home(request):
 def carrito(request):
     
     usuario = request.user
-
+    config = configuracion.objects.first() # Asegúrate de que haya una landing en la base de datos
+    
     if usuario.is_authenticated:
         perfil = obtener_perfil(usuario)
 
         context = {
             'usuario': usuario.username,
+            'link_contacto': config.numero_contacto if config else None,
+            'mensaje': f'Hola, soy {request.user}, me contacto por ...',
             'tipo_cliente': perfil['tipo_cliente'],
             'numero_usuario': perfil['numero_usuario'],
             'empresa': perfil['empresa'],
@@ -214,6 +217,9 @@ def carrito(request):
 
 @login_required
 def productos(request):
+
+    config = configuracion.objects.first() # Asegúrate de que haya una landing en la base de datos
+    
     # Verifica si el usuario tiene un cliente asociado
     es_cliente = Cliente.objects.filter(usuario=request.user).exists()
     if not es_cliente:
@@ -228,6 +234,8 @@ def productos(request):
             'cliente_habilitado': cliente_habilitado,
             'es_cliente': True,
             'productos_precio': [],
+            'link_contacto': config.numero_contacto if config else None,
+            'mensaje': f'Hola, soy {request.user}, me contacto por ...',
             'sin_lista_de_precio': True,
         }
         return render(request, 'productos.html', context)
@@ -289,8 +297,8 @@ def productos(request):
         'productos_precio_json': productos_precio_json,
         'categorias_json': categorias_json,
         'categorias_ordenadas_json': categorias_ordenadas,
-        
-
+        'link_contacto': config.numero_contacto if config else None,
+        'mensaje': f'Hola, soy {request.user}, me contacto por ...',
     }
     return render(request, 'productos.html', context)
 

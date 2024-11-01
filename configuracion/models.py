@@ -135,6 +135,7 @@ class configuracion(models.Model):
     mail_bienvenida_proveedor = models.BooleanField(default=False)
     gestionar_armar_pedido = models.BooleanField(default=True,help_text='Si desea gestionar el armado de los pedidos, dejar esta casilla en True.')
     gestionar_entrega = models.BooleanField(default=True,help_text='Si desea gestionar la entrega de los pedidos de clientes (Fletes, Entregas), dejar esta casilla en True.')
+    numero_contacto = models.CharField(max_length=15, default="+541157045506")
 
     class Meta:
         verbose_name = 'configuracion' 

@@ -20,14 +20,17 @@ body {
 
 /* Product Card */
 .product-card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    margin-bottom: 20px;
-    cursor: pointer;
+    width: 200px; /* Ancho mínimo para cada tarjeta de producto */
+    margin-right: 1rem; /* Espacio entre las tarjetas */
+    flex: 0 0 auto; /* Para que no se expandan */
+    border: 1px solid #ddd; /* Opcional: borde para las tarjetas */
+    border-radius: 8px; /* Opcional: bordes redondeados */
+    text-align: center; /* Centramos el texto */
+    background-color: #fff; /* Color de fondo */
+    padding: 10px; /* Espaciado interno de las tarjetas */
+    
 }
-.product-card:hover {
+.prduct-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }

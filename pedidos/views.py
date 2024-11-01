@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
+from front.views import obtener_perfil
 from pedidos.utils import generar_movimiento_venta
 from .models import Pedido, ItemPedido
 from agenda.models import Cliente
@@ -77,6 +78,8 @@ def finalizar_entrega_pedido(request, id):
 @login_required
 def carrito(request):
 
+    config = configuracion.objects.first()
+
     try:
         # Intentar obtener el cliente asociado al usuario
         cliente = Cliente.objects.get(usuario=request.user)
@@ -96,9 +99,17 @@ def carrito(request):
         items = pedido.items.all()  # Obtener los ítems del pedido
         total = sum(item.subtotal() for item in items)  # Calcular total
 
+        usuario = request.user
+        perfil = obtener_perfil(usuario)
         context = {
             'items': items,
             'total': total,
+            'tipo_cliente': perfil['tipo_cliente'],
+            'numero_usuario': perfil['numero_usuario'],
+            'empresa': perfil['empresa'],
+        
+            'link_contacto': config.numero_contacto if config else None,
+            'mensaje': f'Hola, soy {request.user}, me contacto por ...',
         }
         return render(request, 'carrito.html', context)
 

@@ -18,7 +18,7 @@
     {% endblock %}
 
 </head>
-<body>
+<body style=" background-color: cadetblue;">
     <div style="padding: 5px;">
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container">
@@ -115,7 +115,7 @@
                 <div class="profile-actions d-flex justify-content-around mt-3">
                     <a href="https://wa.me/{{ link_contacto }}?text={{ mensaje|urlencode }}" class="btn icon-btn" target="_blank" aria-label="Enviar mensaje por WhatsApp">
                         <i class="fas fa-envelope"></i>
-                        <span>Mensaje</span>
+                        <span>&nbsp; Ayuda</span>
                     </a>
                     
                     <!-- <a href="#" class="btn icon-btn">
@@ -234,49 +234,49 @@
             </div>
         </div>
 
-<!-- Modal de Registro -->
-<div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div class="modal-header pt-0 pb-0">
-                <h2 class="modal-title" id="registerModalLabel">Registrarse</h2>
-                
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'registro' %}" class="mt-2">
-                    {% csrf_token %}
-                    <div class="mb-4 row">
-                        <input type="text" name="username" id="username" class="form-control" placeholder="Usuario" required>
-                        <small class="text-muted row pt-1" style="text-align: left;">El nombre de usuario no puede contener espacios y debe respetar mayúsculas y minúsculas.</small>
-                    </div>
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="modal-header pt-0 pb-0">
+                    <h2 class="modal-title" id="registerModalLabel">Registrarse</h2>
+                    
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'registro' %}" class="mt-2">
+                        {% csrf_token %}
+                        <div class="mb-4 row">
+                            <input type="text" name="username" id="username" class="form-control" placeholder="Usuario" required>
+                            <small class="text-muted row pt-1" style="text-align: left;">El nombre de usuario no puede contener espacios y debe respetar mayúsculas y minúsculas.</small>
+                        </div>
 
-                    <div class="mb-4 row">
-                        <input type="email" name="email" id="email" class="form-control" placeholder="Correo Electrónico" required>
-                        <small class="text-muted row pt-1">Recibirás un enlace de confirmación en este correo.</small>
-                    </div>
+                        <div class="mb-4 row">
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Correo Electrónico" required>
+                            <small class="text-muted row pt-1">Recibirás un enlace de confirmación en este correo.</small>
+                        </div>
 
-                    <div class="mb-4 row">
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required>
-                        <small class="text-muted row pt-1">Introduce una contraseña segura.</small>
-                    </div>
+                        <div class="mb-4 row">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Contraseña" required>
+                            <small class="text-muted row pt-1">Introduce una contraseña segura.</small>
+                        </div>
 
-                    <div class="mb-4 row">
-                        <input type="password" name="password2" id="password2" class="form-control" placeholder="Repite la Contraseña" required>
-                        <small class="text-muted row pt-1">Vuelve a introducir la misma contraseña.</small>
-                    </div>
+                        <div class="mb-4 row">
+                            <input type="password" name="password2" id="password2" class="form-control" placeholder="Repite la Contraseña" required>
+                            <small class="text-muted row pt-1">Vuelve a introducir la misma contraseña.</small>
+                        </div>
 
-                    <button type="submit" class="btn btn-dark w-100 mt-3" id="registerButton">
-                        Registrarse 🚀
-                    </button>
-                </form>
-                <div class="mt-3 text-center">
-                    <p>¿Ya tienes cuenta? <a href="#" id="openLoginModal" class="text-primary">Inicia Sesión aquí</a></p>
+                        <button type="submit" class="btn btn-dark w-100 mt-3" id="registerButton">
+                            Registrarse 🚀
+                        </button>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <p>¿Ya tienes cuenta? <a href="#" id="openLoginModal" class="text-primary">Inicia Sesión aquí</a></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
     </div>

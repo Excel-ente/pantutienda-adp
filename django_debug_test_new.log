@@ -1965,3 +1965,14 @@ Traceback (most recent call last):
     raise FieldError(
 django.core.exceptions.FieldError: Unknown field(s) (background_color) specified for Landing. Check fields/fieldsets/exclude attributes of class LandingAdmin.
 ERROR 2024-10-31 23:24:36,867 basehttp "GET /app/front/landing/1/change/ HTTP/1.1" 500 183451
+ERROR 2024-11-01 10:01:32,423 exception Invalid HTTP_HOST header: 'example.com:443'. You may need to add 'example.com' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/utils/deprecation.py", line 133, in __call__
+    response = self.process_request(request)
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/ubuntu/aplicaciones/django_env/lib/python3.10/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'example.com:443'. You may need to add 'example.com' to ALLOWED_HOSTS.
